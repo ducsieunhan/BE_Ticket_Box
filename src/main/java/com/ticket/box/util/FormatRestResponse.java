@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.ticket.box.domain.RestResponse;
+import com.ticket.box.util.annotation.ApiMessage;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -38,7 +39,8 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
       return body;
     } else {
       res.setData(body);
-      res.setMessage("call api successs");
+      ApiMessage message = returnType.getMethodAnnotation(ApiMessage.class);
+      res.setMessage(message != null ? message.value() : "Call api success");
     }
 
     return res;
