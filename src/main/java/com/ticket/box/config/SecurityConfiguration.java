@@ -42,11 +42,12 @@ public class SecurityConfiguration {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
+        .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authz -> authz
             .requestMatchers("/", "/login").permitAll()
-            .anyRequest().authenticated())
-        // .anyRequest().permitAll())
-        .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()) // programmed to using jwt 3.1
+            // .anyRequest().authenticated())
+            .anyRequest().permitAll())
+        .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()) // programmed to using jwt
             .authenticationEntryPoint(customAuthenticationEntryPoint)) // token for authentication for all
         .formLogin(f -> f.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -65,7 +66,7 @@ public class SecurityConfiguration {
     return jwtAuthenticationConverter;
   }
 
-  // phase 3 (next 3.1) : Decode JWT and verify user when user have request (3.2)
+  // Decode JWT and verify user when user have request
   @Bean
   public JwtDecoder jwtDecoder() {
     NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
