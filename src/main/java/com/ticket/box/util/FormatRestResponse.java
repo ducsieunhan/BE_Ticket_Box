@@ -1,4 +1,4 @@
-package com.ticket.box.util.error;
+package com.ticket.box.util;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
