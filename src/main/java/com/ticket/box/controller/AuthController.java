@@ -145,4 +145,29 @@ public class AuthController {
         .body(res);
   }
 
+  @PostMapping("/logout")
+  @ApiMessage("Logout account")
+  public ResponseEntity<Void> logout()
+      throws IdInvalidException {
+
+    String email = this.securityUtil.getCurrentUserLogin().isPresent() ? this.securityUtil.getCurrentUserLogin().get()
+        : "";
+
+    if (email.equals("")) {
+      throw new IdInvalidException("Access token invalid");
+    }
+
+    this.userService.updateUserToken(null, email);
+
+    ResponseCookie resCookie = ResponseCookie.from("refresh_token", null)
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(0)
+        .build();
+
+    return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE, resCookie.toString())
+        .body(null);
+  }
 }
