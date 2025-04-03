@@ -3,9 +3,11 @@ package com.ticket.box.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticket.box.domain.User;
-import com.ticket.box.domain.dto.ResUserDTO;
+import com.ticket.box.domain.request.ReqUserDTO;
+import com.ticket.box.domain.response.ResUserDTO;
 import com.ticket.box.service.UserService;
 import com.ticket.box.util.annotation.ApiMessage;
+import com.ticket.box.util.error.DataInvalidException;
 
 import jakarta.validation.Valid;
 
@@ -37,11 +39,12 @@ public class UserController {
 
   @PostMapping("/users")
   @ApiMessage("/Create new user")
-  public ResponseEntity<ResUserDTO> createNewUser(@Valid @RequestBody ResUserDTO userDTO) {
-    User user = this.userService.createNewUser(userDTO);
+  public ResponseEntity<ResUserDTO> createNewUser(@Valid @RequestBody ReqUserDTO user) throws DataInvalidException {
+
     String hashPassword = passwordEncoder.encode(user.getPassword());
     user.setPassword(hashPassword);
-    return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertResUserDTO(user));
+    User endUser = this.userService.createNewUser(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertResUserDTO(endUser));
   }
 
   @GetMapping("/users")
@@ -73,7 +76,7 @@ public class UserController {
 
   @PutMapping("/users/update")
   @ApiMessage("Update user")
-  public ResponseEntity<ResUserDTO> updateUser(@Valid @RequestBody User user) {
+  public ResponseEntity<ResUserDTO> updateUser(@Valid @RequestBody ReqUserDTO user) {
     User updatedUser = this.userService.updateUser(user);
     return ResponseEntity.ok().body(this.userService.convertResUserDTO(updatedUser));
   }

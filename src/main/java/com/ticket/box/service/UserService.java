@@ -1,28 +1,46 @@
 package com.ticket.box.service;
 
+import java.lang.classfile.ClassFile.Option;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.ticket.box.domain.Role;
 import com.ticket.box.domain.User;
-import com.ticket.box.domain.dto.ResUserDTO;
+import com.ticket.box.domain.request.ReqUserDTO;
+import com.ticket.box.domain.response.ResUserDTO;
 import com.ticket.box.repository.RoleRepository;
 import com.ticket.box.repository.UserRepository;
+import com.ticket.box.util.error.DataInvalidException;
 
 @Service
 public class UserService {
   private UserRepository userRepository;
   private RoleRepository roleRepository;
+  private ModelMapper modelMapper;
 
-  public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+  public UserService(UserRepository userRepository, RoleRepository roleRepository, ModelMapper modelMapper) {
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
+    this.modelMapper = modelMapper;
   }
 
-  public User createNewUser(ResUserDTO resUser) {
-    User user = loadUserFromResUserDTO(resUser);
+  public User createNewUser(ReqUserDTO reqUser) throws DataInvalidException {
+    // if (reqUser.getRoleId() != 1 || reqUser.getRoleId() != 2) {
+    // throw new IdInvalidException("Role is not exist");
+    // }
+    if (this.userRepository.existsByEmail(reqUser.getEmail())) {
+      throw new DataInvalidException("Email is already exists");
+    }
+    if (this.userRepository.existsByPhone(reqUser.getPhone())) {
+      throw new DataInvalidException("Phone is already exists");
+    }
+    User user = loadUserFromReqUserDTO(reqUser);
+    // User user = modelMapper.map(reqUser, User.class);
+    Role role = this.roleRepository.findById(reqUser.getRole()).get();
+    user.setRole(role);
     return this.userRepository.save(user);
   }
 
@@ -43,8 +61,8 @@ public class UserService {
     this.userRepository.deleteById(id);
   }
 
-  public User updateUser(User reqUser) {
-    User currentUser = getUserById(reqUser.getId()).get();
+  public User updateUser(ReqUserDTO reqUser) {
+    User currentUser = this.userRepository.findByEmail(reqUser.getEmail());
     if (currentUser != null) {
 
       currentUser.setDob(reqUser.getDob());
@@ -56,7 +74,7 @@ public class UserService {
       currentUser.setHouseNumber(reqUser.getHouseNumber());
       currentUser.setProvince(reqUser.getProvince());
       currentUser.setWard(reqUser.getWard());
-      currentUser.setRefreshToken(reqUser.getRefreshToken());
+
     }
     return this.userRepository.save(currentUser);
   }
@@ -96,6 +114,25 @@ public class UserService {
     user.setProvince(resUserDTO.getProvince());
     user.setRole(role);
     user.setWard(resUserDTO.getWard());
+    return user;
+  }
+
+  public User loadUserFromReqUserDTO(ReqUserDTO reqUserDTO) throws DataInvalidException {
+    User user = new User();
+    Optional<Role> role = this.roleRepository.findById(reqUserDTO.getRole());
+    if (!role.isPresent()) {
+      throw new DataInvalidException("Role is not exist");
+    }
+    user.setDistrict(reqUserDTO.getDistrict());
+    user.setDob(reqUserDTO.getDob());
+    user.setEmail(reqUserDTO.getEmail());
+    user.setHouseNumber(reqUserDTO.getHouseNumber());
+    user.setName(reqUserDTO.getName());
+    user.setPassword(reqUserDTO.getPassword());
+    user.setPhone(reqUserDTO.getPhone());
+    user.setProvince(reqUserDTO.getProvince());
+    user.setRole(role.get());
+    user.setWard(reqUserDTO.getWard());
     return user;
   }
 
