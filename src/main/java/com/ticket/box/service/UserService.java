@@ -91,7 +91,7 @@ public class UserService {
     res.setDob(user.getDob());
     res.setEmail(user.getEmail());
     res.setName(user.getName());
-    res.setPassword(user.getPassword());
+    res.setPassword(null);
     res.setPhone(user.getPhone());
     res.setDistrict(user.getDistrict());
     res.setHouseNumber(user.getHouseNumber());
@@ -109,7 +109,6 @@ public class UserService {
     user.setEmail(resUserDTO.getEmail());
     user.setHouseNumber(resUserDTO.getHouseNumber());
     user.setName(resUserDTO.getName());
-    user.setPassword(resUserDTO.getPassword());
     user.setPhone(resUserDTO.getPhone());
     user.setProvince(resUserDTO.getProvince());
     user.setRole(role);
