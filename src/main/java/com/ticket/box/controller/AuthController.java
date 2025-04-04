@@ -2,12 +2,15 @@ package com.ticket.box.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +23,7 @@ import com.ticket.box.util.annotation.ApiMessage;
 import com.ticket.box.util.error.IdInvalidException;
 
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,21 +35,27 @@ public class AuthController {
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final SecurityUtil securityUtil;
   private final UserService userService;
+  private PasswordEncoder passwordEncoder;
 
   @Value("${ticket.jwt.refresh-token-validity-in-seconds}")
   private long refreshTokenExpiration;
 
   public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
-      UserService userService) {
+      UserService userService, PasswordEncoder passwordEncoder) {
     this.authenticationManagerBuilder = authenticationManagerBuilder;
     this.securityUtil = securityUtil;
     this.userService = userService;
+    this.passwordEncoder = passwordEncoder;
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ResLoginDTO> login(@RequestBody LoginDto loginDto) {
+  public ResponseEntity<ResLoginDTO> login(@RequestBody LoginDto loginDto) throws IdInvalidException {
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
         loginDto.getUsername(), loginDto.getPassword());
+    if (this.userService.handleGetUserByUsername(loginDto.getUsername()) == null) {
+      throw new IdInvalidException("Account not exists!");
+    }
+
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -78,7 +88,7 @@ public class AuthController {
         .body(res);
   }
 
-  @PostMapping("/account")
+  @GetMapping("/account")
   @ApiMessage("Fetch account")
   public ResponseEntity<ResLoginDTO.UserLogin> getAccount() {
     String email = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
@@ -169,5 +179,25 @@ public class AuthController {
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, resCookie.toString())
         .body(null);
+  }
+
+  @PostMapping("/register")
+  @ApiMessage("Logout account")
+  public ResponseEntity<String> getRegister(@RequestBody LoginDto loginDto) throws IdInvalidException {
+    if (this.userService.handleGetUserByUsername(loginDto.getUsername()) != null) {
+      throw new IdInvalidException("This email already exist!!");
+    }
+    User newUser = new User();
+    newUser.setEmail(loginDto.getUsername());
+    String hashPassword = passwordEncoder.encode(loginDto.getPassword());
+    newUser.setPassword(hashPassword);
+
+    User createUser = this.userService.createNewUser(newUser);
+
+    if (createUser == null) {
+      throw new IdInvalidException("Error !!");
+    }
+
+    return ResponseEntity.status(HttpStatus.CREATED).body("Successfully created new user");
   }
 }
