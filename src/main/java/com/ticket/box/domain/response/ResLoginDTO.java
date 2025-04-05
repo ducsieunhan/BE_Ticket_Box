@@ -1,4 +1,4 @@
-package com.ticket.box.domain.dto;
+package com.ticket.box.domain.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
