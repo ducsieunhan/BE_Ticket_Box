@@ -1,10 +1,13 @@
 package com.ticket.box.domain;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -29,5 +32,8 @@ public class User {
 
   @Column(columnDefinition = "MEDIUMTEXT")
   private String refreshToken;
+
+  @OneToMany(mappedBy = "user")
+  private List<Order> orders;
 
 }

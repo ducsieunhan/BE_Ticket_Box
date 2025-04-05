@@ -15,8 +15,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticket.box.domain.User;
-import com.ticket.box.domain.dto.LoginDto;
-import com.ticket.box.domain.dto.ResLoginDTO;
+import com.ticket.box.domain.require.ReqLoginDto;
+import com.ticket.box.domain.response.ResLoginDTO;
 import com.ticket.box.service.UserService;
 import com.ticket.box.util.SecurityUtil;
 import com.ticket.box.util.annotation.ApiMessage;
@@ -49,7 +49,8 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ResLoginDTO> login(@RequestBody LoginDto loginDto) throws IdInvalidException {
+  @ApiMessage("Login Account")
+  public ResponseEntity<ResLoginDTO> login(@RequestBody ReqLoginDto loginDto) throws IdInvalidException {
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
         loginDto.getUsername(), loginDto.getPassword());
     if (this.userService.handleGetUserByUsername(loginDto.getUsername()) == null) {
@@ -183,7 +184,7 @@ public class AuthController {
 
   @PostMapping("/register")
   @ApiMessage("Logout account")
-  public ResponseEntity<String> getRegister(@RequestBody LoginDto loginDto) throws IdInvalidException {
+  public ResponseEntity<String> getRegister(@RequestBody ReqLoginDto loginDto) throws IdInvalidException {
     if (this.userService.handleGetUserByUsername(loginDto.getUsername()) != null) {
       throw new IdInvalidException("This email already exist!!");
     }
