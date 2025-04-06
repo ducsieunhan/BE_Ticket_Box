@@ -9,6 +9,8 @@ import com.ticket.box.domain.User;
 public interface UserRepository extends JpaRepository<User, Long> {
   User findByEmail(String email);
 
+  User findByRefreshTokenAndEmail(String token, String email);
+
   boolean existsByEmail(String email);
 
   boolean existsByPhone(String phone);

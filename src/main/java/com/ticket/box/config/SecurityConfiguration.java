@@ -44,9 +44,11 @@ public class SecurityConfiguration {
         .csrf(csrf -> csrf.disable())
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authz -> authz
-            .requestMatchers("/", "/login").permitAll()
-            // .anyRequest().authenticated())
-            .anyRequest().permitAll())
+            .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/refresh",
+                "/api/v1/auth/register")
+            .permitAll()
+            .anyRequest().authenticated())
+        // .anyRequest().permitAll())
         .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()) // programmed to using jwt
             .authenticationEntryPoint(customAuthenticationEntryPoint)) // token for authentication for all
         .formLogin(f -> f.disable())
@@ -59,7 +61,7 @@ public class SecurityConfiguration {
   public JwtAuthenticationConverter jwtAuthenticationConverter() {
     JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
     grantedAuthoritiesConverter.setAuthorityPrefix("");
-    grantedAuthoritiesConverter.setAuthoritiesClaimName("hoidanit");
+    grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
 
     JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
     jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

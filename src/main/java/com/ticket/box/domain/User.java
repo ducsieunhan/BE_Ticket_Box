@@ -1,5 +1,7 @@
 package com.ticket.box.domain;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -25,13 +27,17 @@ public class User {
   @Size(min = 6, message = "Password must be at least 8 characters long")
   private String password;
 
+  @Column(columnDefinition = "MEDIUMTEXT")
+  private String refreshToken;
+
+  @OneToMany(mappedBy = "user")
+  private List<Order> orders;
+
   @Pattern(regexp = "^[0-9]*$", message = "Phone number must contain only digits")
   @Pattern(regexp = "^.{10,15}$", message = "Phone number must be 10-15 characters long")
   private String phone;
 
   private String dob;
-
-  private String refreshToken;
 
   private String province;
 

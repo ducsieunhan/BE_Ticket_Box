@@ -30,6 +30,18 @@ public class GlobalException {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
   }
 
+  @ExceptionHandler(value = {
+      IdInvalidException.class
+  })
+  public ResponseEntity<RestResponse<Object>> handleIdInvalidException(Exception e) {
+    RestResponse<Object> res = new RestResponse<Object>();
+    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+    res.setError(e.getMessage());
+    res.setMessage("Account not found... ");
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<RestResponse<Object>> validationError(MethodArgumentNotValidException ex) {
     BindingResult result = ex.getBindingResult();

@@ -1,5 +1,7 @@
 package com.ticket.box.domain.request;
 
+import com.ticket.box.domain.User;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -39,4 +41,23 @@ public class ReqUserDTO {
     private String houseNumber;
     private Long role;
 
+    public static ReqUserDTO fromEntity(User user) {
+        ReqUserDTO userDTO = new ReqUserDTO();
+
+        userDTO.setEmail(user.getEmail());
+        userDTO.setName(user.getName());
+        userDTO.setPassword(user.getPassword()); // Note: Be careful with password in DTOs
+        userDTO.setPhone(user.getPhone());
+        userDTO.setDob(user.getDob());
+        userDTO.setProvince(user.getProvince());
+        userDTO.setDistrict(user.getDistrict());
+        userDTO.setWard(user.getWard());
+        userDTO.setHouseNumber(user.getHouseNumber());
+
+        if (user.getRole() != null) {
+            userDTO.setRole(user.getRole().getId());
+        }
+
+        return userDTO;
+    }
 }
