@@ -9,6 +9,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -55,5 +56,15 @@ public class GlobalException {
     res.setMessage(errors.size() > 1 ? errors : errors.get(0));
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+  }
+
+  @ExceptionHandler(OrderNotFoundException.class)
+  public ResponseEntity<RestResponse<Object>> handleOrderNotFound(OrderNotFoundException e) {
+    RestResponse<Object> res = new RestResponse<Object>();
+    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+    res.setError(e.getMessage());
+    res.setMessage("Order not found... ");
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
   }
 }
