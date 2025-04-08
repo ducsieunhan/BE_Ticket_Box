@@ -1,7 +1,7 @@
 package com.ticket.box.domain.response;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.util.List;
 
 import com.ticket.box.util.constant.StatusOrderEnum;
 
@@ -28,6 +28,8 @@ public class ResOrderDTO {
   private Instant createdAt;
 
   private UserLogin user;
+
+  private List<ResOrderDetailDTO> items;
 
   @Getter
   @Setter

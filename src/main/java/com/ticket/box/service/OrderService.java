@@ -1,5 +1,6 @@
 package com.ticket.box.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -7,14 +8,20 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import com.ticket.box.domain.Order;
+import com.ticket.box.domain.OrderDetail;
 import com.ticket.box.domain.User;
+import com.ticket.box.domain.require.ReqOrderDetailDto;
 import com.ticket.box.domain.require.ReqOrderDto;
+import com.ticket.box.domain.require.ReqUpdateOrderDetail;
 import com.ticket.box.domain.require.ReqUpdateOrderDto;
 import com.ticket.box.domain.response.ResOrderDTO;
+import com.ticket.box.domain.response.ResOrderDetailDTO;
 import com.ticket.box.domain.response.ResultPaginationDTO;
+import com.ticket.box.repository.OrderDetailRepository;
 import com.ticket.box.repository.OrderRepository;
 import com.ticket.box.util.SecurityUtil;
 import com.ticket.box.util.constant.StatusOrderEnum;
@@ -25,10 +32,15 @@ import com.ticket.box.util.error.OrderNotFoundException;
 public class OrderService {
   private OrderRepository orderRepository;
   private UserService userService;
+  private OrderDetailService orderDetailService;
+  private OrderDetailRepository orderDetailRepository;
 
-  public OrderService(OrderRepository orderRepository, UserService userService) {
+  public OrderService(OrderRepository orderRepository, UserService userService, OrderDetailService orderDetailService,
+      OrderDetailRepository orderDetailRepository) {
     this.orderRepository = orderRepository;
     this.userService = userService;
+    this.orderDetailService = orderDetailService;
+    this.orderDetailRepository = orderDetailRepository;
   }
 
   public Order handleCreateNewOrder(ReqOrderDto orderdDto) throws IdInvalidException {
@@ -47,6 +59,18 @@ public class OrderService {
     newOrder.setStatus(StatusOrderEnum.PENDING);
     newOrder.setUser(currentUser);
 
+    newOrder = this.orderRepository.save(newOrder);
+
+    // order detail
+
+    List<OrderDetail> items = new ArrayList<>();
+    for (ReqOrderDetailDto dto : orderdDto.getItems()) {
+      OrderDetail o = this.orderDetailService.handleCreateNewItems(dto, newOrder);
+      items.add(o);
+    }
+
+    newOrder.setOrderDetails(items);
+
     return this.orderRepository.save(newOrder);
   }
 
@@ -55,10 +79,19 @@ public class OrderService {
     Order currentOrder = orderRepository.findById(orderdDto.getId())
         .orElseThrow(() -> new OrderNotFoundException(orderdDto.getId()));
 
+    currentOrder.setTotalPrice(orderdDto.getTotalPrice());
     currentOrder.setReceiverName(orderdDto.getReceiverName());
     currentOrder.setReceiverEmail(orderdDto.getReceiverEmail());
     currentOrder.setReceiverPhone(orderdDto.getReceiverPhone());
     currentOrder.setStatus(orderdDto.getStatus());
+
+    // order detail update
+
+    List<OrderDetail> items = new ArrayList<>();
+    for (ReqUpdateOrderDetail o : orderdDto.getItems()) {
+      OrderDetail updated = this.orderDetailService.handleUpdateAOrderItems(o);
+      items.add(updated);
+    }
 
     return this.orderRepository.save(currentOrder);
   }
@@ -69,6 +102,10 @@ public class OrderService {
   }
 
   public void handleDeleteOrder(Order order) {
+    List<OrderDetail> items = this.orderDetailRepository.findByOrderId(order.getId());
+    for (OrderDetail o : items) {
+      this.orderDetailService.handleDeleteItems(o);
+    }
     this.orderRepository.delete(order);
   }
 
@@ -111,26 +148,24 @@ public class OrderService {
 
     orderDTO.setUser(user);
 
+    // order detail
+
+    List<ResOrderDetailDTO> dto = new ArrayList<>();
+
+    for (OrderDetail o : order.getOrderDetails()) {
+      ResOrderDetailDTO converted = this.orderDetailService.convertToResOrderDetail(o);
+      dto.add(converted);
+    }
+
+    orderDTO.setItems(dto);
+
     return orderDTO;
   }
 
   public List<ResOrderDTO> handleConvertToListResOrderDto(List<Order> orders) {
     return orders.stream()
         .map(order -> {
-          ResOrderDTO dto = new ResOrderDTO();
-          dto.setOrderId(order.getId());
-          dto.setTotalPrice(order.getTotalPrice());
-          dto.setStatus(order.getStatus());
-          dto.setReceiverName(order.getReceiverName());
-          dto.setReceiverEmail(order.getReceiverEmail());
-          dto.setReceiverPhone(order.getReceiverPhone());
-          dto.setCreatedAt(order.getCreatedAt());
-
-          ResOrderDTO.UserLogin userLogin = new ResOrderDTO.UserLogin();
-          userLogin.setEmail(order.getUser().getEmail());
-          userLogin.setName(order.getUser().getName());
-          dto.setUser(userLogin);
-
+          ResOrderDTO dto = handleCastToResOrderDTO(order);
           return dto;
         })
         .collect(Collectors.toList());

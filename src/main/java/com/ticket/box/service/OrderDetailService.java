@@ -55,6 +55,22 @@ public class OrderDetailService {
     return this.orderDetailRepository.save(orderDetail);
   }
 
+  public OrderDetail handleCreateNewItems(ReqOrderDetailDto dto, Order order)
+      throws OrderNotFoundException, TicketNotFoundException {
+
+    Ticket currentTicket = this.ticketRepository.findById(dto.getTicketId())
+        .orElseThrow(() -> new TicketNotFoundException(dto.getTicketId()));
+
+    OrderDetail orderDetail = new OrderDetail();
+    orderDetail.setOrder(order);
+    orderDetail.setTicket(currentTicket);
+
+    orderDetail.setPrice(dto.getSubTotal());
+    orderDetail.setQuantity(dto.getQuantity());
+
+    return this.orderDetailRepository.save(orderDetail);
+  }
+
   public OrderDetail handleUpdateAOrderItems(ReqUpdateOrderDetail dto) throws OrderNotFoundException {
     OrderDetail currentOrder = this.orderDetailRepository.findById(dto.getOrderDetailId())
         .orElseThrow(() -> new OrderNotFoundException(dto.getOrderDetailId()));
@@ -123,21 +139,7 @@ public class OrderDetailService {
 
   public List<ResOrderDetailDTO> convertAllToResOrderDetail(List<OrderDetail> orderDetails) {
     return orderDetails.stream().map(orderDetail -> {
-      ResOrderDetailDTO dto = new ResOrderDetailDTO();
-      ResOrderDetailDTO.TicketOrder ticket = new ResOrderDetailDTO.TicketOrder();
-
-      dto.setId(orderDetail.getId());
-      dto.setOrderId(orderDetail.getOrder().getId());
-      dto.setPrice(orderDetail.getTicket().getPrice());
-      dto.setQuantity(orderDetail.getQuantity());
-      dto.setSubTotal(dto.getPrice() * dto.getQuantity());
-      dto.setCreatedAt(orderDetail.getCreatedAt());
-
-      ticket.setEventDate(null);
-      ticket.setId(orderDetail.getTicket().getId());
-      ticket.setName(orderDetail.getTicket().getDescription());
-
-      dto.setTicket(ticket);
+      ResOrderDetailDTO dto = convertToResOrderDetail(orderDetail);
       return dto;
     }).collect(Collectors.toList());
 

@@ -1,5 +1,7 @@
 package com.ticket.box.domain.require;
 
+import java.util.List;
+
 import com.ticket.box.util.constant.StatusOrderEnum;
 
 import jakarta.validation.constraints.Pattern;
@@ -11,6 +13,8 @@ import lombok.Setter;
 public class ReqUpdateOrderDto {
   private long id;
 
+  private double totalPrice;
+
   private String receiverName;
 
   private String receiverEmail;
@@ -19,5 +23,7 @@ public class ReqUpdateOrderDto {
   private String receiverPhone;
 
   private StatusOrderEnum status;
+
+  private List<ReqUpdateOrderDetail> items;
 
 }
