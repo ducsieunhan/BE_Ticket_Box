@@ -22,7 +22,7 @@ public class ResOrderDetailDTO {
   @Setter
   @NoArgsConstructor
   public static class TicketOrder {
-    private long id;
+    private long ticketId;
     private String name;
     private Date eventDate;
   }

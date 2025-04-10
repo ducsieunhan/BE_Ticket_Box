@@ -128,7 +128,7 @@ public class OrderDetailService {
     dto.setCreatedAt(orderDetail.getCreatedAt());
 
     ticket.setEventDate(null);
-    ticket.setId(orderDetail.getTicket().getId());
+    ticket.setTicketId(orderDetail.getTicket().getId());
     ticket.setName(orderDetail.getTicket().getDescription());
 
     dto.setTicket(ticket);
