@@ -23,9 +23,11 @@ public class FileService {
         // uri is url for access file
         // path is file in device
         // uri for using Paths
-        URI uri = new URI(folder);
-        // convert uri into path
-        Path path = Paths.get(uri);
+        // URI uri = new URI(folder);
+        // // convert uri into path
+        // Path path = Paths.get(uri);
+        // File tmpDir = new File(path.toString());
+        Path path = Paths.get(folder);
         File tmpDir = new File(path.toString());
         if (!tmpDir.isDirectory()) {
             try {
@@ -43,8 +45,9 @@ public class FileService {
         // create unique filename to avoid duplicate filename
         String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
 
-        URI uri = new URI(baseURI + folder + "/" + finalName);
-        Path path = Paths.get(uri);
+        // URI uri = new URI(baseURI + folder + "/" + finalName);
+        // Path path = Paths.get(uri);
+        Path path = Paths.get(folder, finalName);
         // not contain catch to close inputstream automatically
         try (InputStream inputStream = file.getInputStream()) {
             // copy uploaded file to desired destination

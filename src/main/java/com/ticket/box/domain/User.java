@@ -2,6 +2,9 @@ package com.ticket.box.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.ticket.box.domain.response.ResEventDTO;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -50,4 +53,10 @@ public class User {
   @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
   private Role role;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "user_event", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
+  @JsonIgnoreProperties({ "users", "tickets", "organizer" }) // Prevent JSON loops
+  private List<Event> events;
+
 }

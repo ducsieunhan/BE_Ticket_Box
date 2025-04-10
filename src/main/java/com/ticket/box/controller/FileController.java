@@ -50,9 +50,13 @@ public class FileController {
                     allowedExtensions.toString());
         }
         // create a directory if not exist
-        this.fileService.createDirectory(baseURI + folder);
-        // store file
-        String uploadFile = this.fileService.store(file, folder);
+        // this.fileService.createDirectory(baseURI + folder);
+        // // store file
+        // String uploadFile = this.fileService.store(file, folder);
+        String fullFolderPath = baseURI.replace("file:/", "").replaceAll("^/+", "") + folder;
+        this.fileService.createDirectory(fullFolderPath);
+        String uploadFile = this.fileService.store(file, fullFolderPath);
+
         ResUploadFileDTO res = new ResUploadFileDTO(uploadFile, Instant.now());
         return ResponseEntity.ok().body(res);
     }
