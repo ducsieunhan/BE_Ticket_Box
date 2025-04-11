@@ -15,11 +15,13 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticket.box.domain.User;
+import com.ticket.box.domain.request.ReqUserDTO;
 import com.ticket.box.domain.require.ReqLoginDto;
 import com.ticket.box.domain.response.ResLoginDTO;
 import com.ticket.box.service.UserService;
 import com.ticket.box.util.SecurityUtil;
 import com.ticket.box.util.annotation.ApiMessage;
+import com.ticket.box.util.error.DataInvalidException;
 import com.ticket.box.util.error.IdInvalidException;
 
 import org.springframework.web.bind.annotation.CookieValue;
@@ -184,7 +186,8 @@ public class AuthController {
 
   @PostMapping("/register")
   @ApiMessage("Logout account")
-  public ResponseEntity<String> getRegister(@RequestBody ReqLoginDto loginDto) throws IdInvalidException {
+  public ResponseEntity<String> getRegister(@RequestBody ReqLoginDto loginDto)
+      throws IdInvalidException, DataInvalidException {
     if (this.userService.handleGetUserByUsername(loginDto.getUsername()) != null) {
       throw new IdInvalidException("This email already exist!!");
     }
@@ -192,8 +195,9 @@ public class AuthController {
     newUser.setEmail(loginDto.getUsername());
     String hashPassword = passwordEncoder.encode(loginDto.getPassword());
     newUser.setPassword(hashPassword);
-
-    User createUser = this.userService.createNewUser(newUser);
+    ReqUserDTO reqUser = new ReqUserDTO();
+    reqUser.fromEntity(newUser);
+    User createUser = this.userService.createNewUser(reqUser);
 
     if (createUser == null) {
       throw new IdInvalidException("Error !!");
