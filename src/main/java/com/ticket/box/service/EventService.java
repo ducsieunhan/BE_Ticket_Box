@@ -20,6 +20,7 @@ import com.ticket.box.repository.EventRepository;
 import com.ticket.box.repository.OrganizerRepository;
 import com.ticket.box.repository.TicketRepository;
 import com.ticket.box.repository.UserRepository;
+import com.ticket.box.util.constant.StatusEventEnum;
 import com.ticket.box.util.error.IdInvalidException;
 
 @Service
@@ -77,7 +78,7 @@ public class EventService {
         }
         Event optEvent = fromReqDtoToEvent(reqEvent);
         List<EventTicket> tickets = reqEvent.getTickets();
-
+        optEvent.setStatus(StatusEventEnum.WAITING_FOR_SALE);
         Event currEvent = this.eventRepository.save(optEvent);
         for (EventTicket ticket : tickets) {
             Ticket newTicket = new Ticket();
@@ -134,7 +135,7 @@ public class EventService {
         res.setProvince(event.getProvince());
         res.setStartDate(event.getStartDate());
         res.setWard(event.getWard());
-
+        res.setStatus(event.getStatus());
         List<Ticket> tList = event.getTickets();
         if (tList != null && !tList.isEmpty()) {
             for (Ticket ticket : tList) {
@@ -144,6 +145,7 @@ public class EventService {
                 eventTicket.setPrice(ticket.getPrice());
                 eventTicket.setQuantity(ticket.getQuantity());
                 eventTicket.setSold(ticket.getSold());
+                eventTicket.setId(ticket.getId());
                 tickets.add(eventTicket);
             }
         }
