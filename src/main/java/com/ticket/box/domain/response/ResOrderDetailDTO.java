@@ -25,5 +25,6 @@ public class ResOrderDetailDTO {
     private long ticketId;
     private String name;
     private Date eventDate;
+    private String event;
   }
 }

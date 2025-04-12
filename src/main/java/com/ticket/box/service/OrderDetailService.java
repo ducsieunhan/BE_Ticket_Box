@@ -130,7 +130,7 @@ public class OrderDetailService {
     ticket.setEventDate(null);
     ticket.setTicketId(orderDetail.getTicket().getId());
     ticket.setName(orderDetail.getTicket().getDescription());
-
+    ticket.setEvent(orderDetail.getTicket().getEvent().getName());
     dto.setTicket(ticket);
 
     return dto;
