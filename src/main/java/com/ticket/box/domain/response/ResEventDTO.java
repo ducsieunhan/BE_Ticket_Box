@@ -6,6 +6,7 @@ import java.util.List;
 import com.ticket.box.domain.Organizer;
 import com.ticket.box.domain.Ticket;
 import com.ticket.box.domain.User;
+import com.ticket.box.util.constant.StatusEventEnum;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
@@ -41,13 +42,14 @@ public class ResEventDTO {
     private List<EventTicket> tickets;
     private List<Participant> participants;
     private String organizerName;
+    private StatusEventEnum status;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class EventTicket {
-
+        private Long id;
         private String type;
 
         private double price;
@@ -63,7 +65,7 @@ public class ResEventDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Participant {
-
+        private Long id;
         private String name;
         private String email;
         private String phone;

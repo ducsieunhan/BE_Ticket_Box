@@ -23,12 +23,12 @@ public class FileService {
         // uri is url for access file
         // path is file in device
         // uri for using Paths
-        // URI uri = new URI(folder);
-        // // convert uri into path
-        // Path path = Paths.get(uri);
-        // File tmpDir = new File(path.toString());
-        Path path = Paths.get(folder);
+        URI uri = new URI(folder);
+        // convert uri into path
+        Path path = Paths.get(uri);
         File tmpDir = new File(path.toString());
+        // Path path = Paths.get(folder);
+        // File tmpDir = new File(path.toString());
         if (!tmpDir.isDirectory()) {
             try {
                 Files.createDirectory(tmpDir.toPath());
@@ -42,17 +42,27 @@ public class FileService {
     }
 
     public String store(MultipartFile file, String folder) throws URISyntaxException, IOException {
-        // create unique filename to avoid duplicate filename
-        String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
+        // get and validate file name
+        String originalFileName = file.getOriginalFilename();
+        if (originalFileName == null) {
+            throw new IOException("Invalid file name");
+        }
+        // config file name tranh dau cach va mot so ky tu dac biet
+        String sanitizedFileName = originalFileName.replaceAll(" ", "_");
+        sanitizedFileName = sanitizedFileName.replaceAll("[^a-zA-Z0-9._-]", "");
 
-        // URI uri = new URI(baseURI + folder + "/" + finalName);
-        // Path path = Paths.get(uri);
-        Path path = Paths.get(folder, finalName);
-        // not contain catch to close inputstream automatically
+        // tao unique file name tranh trung ten bi replace
+        String finalName = System.currentTimeMillis() + "-" + sanitizedFileName;
+
+        // tao file path
+        URI uri = new URI(baseURI + folder + "/" + finalName);
+        Path path = Paths.get(uri);
+
+        // copy uploaded file den thu muc da tao
         try (InputStream inputStream = file.getInputStream()) {
-            // copy uploaded file to desired destination
             Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
         }
+
         return finalName;
     }
 }
