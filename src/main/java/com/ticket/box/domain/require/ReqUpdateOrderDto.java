@@ -20,8 +20,8 @@ import lombok.Setter;
 @Setter
 public class ReqUpdateOrderDto {
 
-  @Positive(message = "Items id must be not null")
-  private long id;
+  @Positive(message = "Order id must be not null")
+  private long orderId;
 
   @PositiveOrZero(message = "Total price must be positive")
   private double totalPrice;

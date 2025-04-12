@@ -75,8 +75,8 @@ public class OrderDetailService {
     OrderDetail currentOrder = this.orderDetailRepository.findById(dto.getOrderDetailId())
         .orElseThrow(() -> new OrderNotFoundException(dto.getOrderDetailId()));
 
-    Ticket currentTicket = this.ticketRepository.findById(dto.getTicketId())
-        .orElseThrow(() -> new TicketNotFoundException(dto.getTicketId()));
+    Ticket currentTicket = this.ticketRepository.findById(dto.getTicket().getTicketId())
+        .orElseThrow(() -> new TicketNotFoundException(dto.getTicket().getTicketId()));
 
     currentOrder.setTicket(currentTicket);
     currentOrder.setQuantity(dto.getQuantity());
@@ -120,7 +120,7 @@ public class OrderDetailService {
     ResOrderDetailDTO dto = new ResOrderDetailDTO();
     ResOrderDetailDTO.TicketOrder ticket = new ResOrderDetailDTO.TicketOrder();
 
-    dto.setId(orderDetail.getId());
+    dto.setOrderDetailId(orderDetail.getId());
     dto.setOrderId(orderDetail.getOrder().getId());
     dto.setPrice(orderDetail.getTicket().getPrice());
     dto.setQuantity(orderDetail.getQuantity());

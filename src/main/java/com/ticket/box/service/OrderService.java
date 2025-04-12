@@ -76,8 +76,8 @@ public class OrderService {
 
   public Order handleUpdateAOrder(ReqUpdateOrderDto orderdDto) throws OrderNotFoundException {
 
-    Order currentOrder = orderRepository.findById(orderdDto.getId())
-        .orElseThrow(() -> new OrderNotFoundException(orderdDto.getId()));
+    Order currentOrder = orderRepository.findById(orderdDto.getOrderId())
+        .orElseThrow(() -> new OrderNotFoundException(orderdDto.getOrderId()));
 
     currentOrder.setTotalPrice(orderdDto.getTotalPrice());
     currentOrder.setReceiverName(orderdDto.getReceiverName());

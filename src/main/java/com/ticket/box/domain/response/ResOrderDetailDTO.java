@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResOrderDetailDTO {
-  private long id;
+  private long orderDetailId;
   private long orderId;
   private TicketOrder ticket;
   private long quantity;
