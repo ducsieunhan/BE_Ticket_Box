@@ -42,6 +42,12 @@ public class Order {
   @OneToMany(mappedBy = "order")
   private List<OrderDetail> orderDetails;
 
+  private String receiverName;
+
+  private String receiverEmail;
+
+  private String receiverPhone;
+
   private Instant createdAt;
   private Instant updatedAt;
   private String createdBy;
