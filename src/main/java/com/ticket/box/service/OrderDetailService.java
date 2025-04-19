@@ -21,6 +21,7 @@ import com.ticket.box.repository.OrderRepository;
 import com.ticket.box.repository.TicketRepository;
 import com.ticket.box.util.error.OrderNotFoundException;
 import com.ticket.box.util.error.TicketNotFoundException;
+import com.ticket.box.util.error.TicketQuantityNotAvail;
 
 @Service
 public class OrderDetailService {
@@ -67,6 +68,13 @@ public class OrderDetailService {
 
     orderDetail.setPrice(dto.getSubTotal());
     orderDetail.setQuantity(dto.getQuantity());
+
+    try {
+      currentTicket.setQuantity(currentTicket.getQuantity() - dto.getQuantity());
+      this.ticketRepository.save(currentTicket);
+    } catch (Exception e) {
+      throw new TicketQuantityNotAvail("Not available quantity of ticket");
+    }
 
     return this.orderDetailRepository.save(orderDetail);
   }

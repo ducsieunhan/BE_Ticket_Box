@@ -77,4 +77,14 @@ public class GlobalException {
 
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
   }
+
+  @ExceptionHandler(TicketQuantityNotAvail.class)
+  public ResponseEntity<RestResponse<Object>> handleTicketQuantityNotAvailable(TicketQuantityNotAvail e) {
+    RestResponse<Object> res = new RestResponse<Object>();
+    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+    res.setError(e.getMessage());
+    res.setMessage("Quantity not available... ");
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+  }
 }

@@ -78,4 +78,12 @@ public class OrderController {
     return ResponseEntity.ok(this.orderService.handleGetAllOrders(spec, pageable));
   }
 
+  @PutMapping("/orders/{id}")
+  @ApiMessage("Update a order")
+  public ResponseEntity<String> cancelOrder(@PathVariable("id") long id) {
+    Order currentOrder = this.orderService.handleGetAOrder(id);
+    this.orderService.handleCancelOrder(currentOrder);
+    return ResponseEntity.ok("Successfully cancel a order");
+  }
+
 }
