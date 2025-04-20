@@ -109,6 +109,11 @@ public class OrderService {
     this.orderRepository.delete(order);
   }
 
+  public void handleCancelOrder(Order order) {
+    order.setStatus(StatusOrderEnum.CANCELLED);
+    this.orderRepository.save(order);
+  }
+
   public ResultPaginationDTO handleGetAllOrders(Specification<Order> spec, Pageable pageable) {
     Page<Order> pOrder = this.orderRepository.findAll(spec, pageable);
     ResultPaginationDTO rs = new ResultPaginationDTO();
