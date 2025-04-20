@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -64,6 +65,15 @@ public class UserController {
       return null;
     }
     User user = optUser.get();
+    return ResponseEntity.ok().body(this.userService.convertResUserDTO(user));
+  }
+
+  @GetMapping("/user")
+  @ApiMessage("Get user by email")
+  public ResponseEntity<ResUserDTO> getUserByEmail(@RequestParam(value = "email") String email) {
+
+    User user = this.userService.handleGetUserByUsername(email);
+
     return ResponseEntity.ok().body(this.userService.convertResUserDTO(user));
   }
 
