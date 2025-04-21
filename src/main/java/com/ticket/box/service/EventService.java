@@ -5,16 +5,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.ticket.box.domain.Category;
 import com.ticket.box.domain.Event;
+import com.ticket.box.domain.Order;
 import com.ticket.box.domain.Organizer;
 import com.ticket.box.domain.Ticket;
 import com.ticket.box.domain.User;
 import com.ticket.box.domain.request.ReqEventDTO;
 import com.ticket.box.domain.request.ReqEventDTO.EventTicket;
 import com.ticket.box.domain.response.ResEventDTO;
+import com.ticket.box.domain.response.ResultPaginationDTO;
 import com.ticket.box.repository.CategoryRepository;
 import com.ticket.box.repository.EventRepository;
 import com.ticket.box.repository.OrganizerRepository;
@@ -43,12 +48,29 @@ public class EventService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<ResEventDTO> getAllEvents() {
-        List<Event> events = this.eventRepository.findAll();
+    // add filter
+    public ResultPaginationDTO getAllEvents(Specification<Event> spec, Pageable pageable) {
+        Page<Event> pEvent = this.eventRepository.findAll(spec, pageable);
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
+
+        meta.setPage(pageable.getPageNumber());
+        meta.setPageSize(pageable.getPageSize());
+
+        meta.setPages(pEvent.getTotalPages());
+        meta.setTotal(pEvent.getTotalElements());
+
+        rs.setMeta(meta);
+
+        List<Event> events = pEvent.getContent();
+
         List<ResEventDTO> results = events.stream()
                 .map(event -> toResEventDTO(event))
                 .collect(Collectors.toList());
-        return results;
+
+        rs.setResult(results);
+
+        return rs;
     }
 
     public ResEventDTO getEventById(Long id) throws IdInvalidException {
