@@ -30,12 +30,15 @@ public class UserService {
     // if (reqUser.getRoleId() != 1 || reqUser.getRoleId() != 2) {
     // throw new IdInvalidException("Role is not exist");
     // }
+    if (reqUser.getPhone()!=null){
+      if (this.userRepository.existsByPhone(reqUser.getPhone())) {
+      throw new DataInvalidException("Phone is already exists");
+    }
+    }
     if (this.userRepository.existsByEmail(reqUser.getEmail())) {
       throw new DataInvalidException("Email is already exists");
     }
-    if (this.userRepository.existsByPhone(reqUser.getPhone())) {
-      throw new DataInvalidException("Phone is already exists");
-    }
+    
     User user = loadUserFromReqUserDTO(reqUser);
     // User user = modelMapper.map(reqUser, User.class);
     Role role = this.roleRepository.findById(reqUser.getRole()).get();
