@@ -195,8 +195,7 @@ public class AuthController {
     newUser.setEmail(loginDto.getUsername());
     String hashPassword = passwordEncoder.encode(loginDto.getPassword());
     newUser.setPassword(hashPassword);
-    ReqUserDTO reqUser = new ReqUserDTO();
-    reqUser.fromEntity(newUser);
+    ReqUserDTO reqUser = ReqUserDTO.fromEntity(newUser);
     User createUser = this.userService.createNewUser(reqUser);
 
     if (createUser == null) {
