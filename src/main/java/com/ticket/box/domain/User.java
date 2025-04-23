@@ -1,5 +1,6 @@
 package com.ticket.box.domain;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class User implements UserDetails {
   private String verificationCode;
 
   @Column(name = "verification_expiration")
-  private String verificationExpiration;
+  private LocalDateTime verificationCodeExpiresAt;
 
   @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
