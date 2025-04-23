@@ -101,6 +101,23 @@
       <artifactId>modelmapper</artifactId>
       <version>2.3.0</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>3.5.3</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.paypal.sdk/rest-api-sdk -->
+    <dependency>
+      <groupId>com.paypal.sdk</groupId>
+      <artifactId>rest-api-sdk</artifactId>
+      <version>1.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.paypal.sdk</groupId>
+      <artifactId>paypal-core</artifactId>
+      <version>1.7.2</version>
+    </dependency>
   </dependencies>
 
   <build>
