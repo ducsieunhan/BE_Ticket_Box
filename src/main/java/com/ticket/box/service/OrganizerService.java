@@ -6,20 +6,25 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.ticket.box.domain.Event;
 import com.ticket.box.domain.Organizer;
 import com.ticket.box.domain.request.ReqEventDTO;
 import com.ticket.box.domain.require.ReqOrganizerDTO;
 import com.ticket.box.domain.response.ResOrganizerDTO;
+import com.ticket.box.repository.EventRepository;
 import com.ticket.box.repository.OrderRepository;
 import com.ticket.box.repository.OrganizerRepository;
 import com.ticket.box.util.error.IdInvalidException;
+import com.ticket.box.util.error.OrganizerCreateException;
 
 @Service
 public class OrganizerService {
     private OrganizerRepository organizerRepository;
+    private EventRepository eventRepository;
 
-    public OrganizerService(OrganizerRepository organizerRepository) {
+    public OrganizerService(OrganizerRepository organizerRepository, EventRepository eventRepository) {
         this.organizerRepository = organizerRepository;
+        this.eventRepository = eventRepository;
     }
 
     public ResOrganizerDTO castToResOrganizer(Organizer organizer) {
@@ -86,7 +91,15 @@ public class OrganizerService {
         return castToResOrganizer(result);
     }
 
-    public void deleteOrganizer(Long id) {
+    public void deleteOrganizer(Long id) throws IdInvalidException {
+        Optional<Organizer> optOrganizer = this.organizerRepository.findById(id);
+        if (!optOrganizer.isPresent()) {
+            throw new IdInvalidException("Organizer is not exist");
+        }
+        List<Event> events = this.eventRepository.findByOrganizer(optOrganizer.get());
+        if (events.size() > 0) {
+            throw new OrganizerCreateException();
+        }
         this.organizerRepository.deleteById(id);
     }
 }

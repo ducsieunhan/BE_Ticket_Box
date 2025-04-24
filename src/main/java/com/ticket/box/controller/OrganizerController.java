@@ -17,6 +17,8 @@ import com.ticket.box.service.OrganizerService;
 import com.ticket.box.util.annotation.ApiMessage;
 import com.ticket.box.util.error.IdInvalidException;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,7 +49,7 @@ public class OrganizerController {
 
     @PostMapping("/organizer")
     @ApiMessage("create new organizer")
-    public ResponseEntity<ResOrganizerDTO> createNewOrganizer(@RequestBody ReqOrganizerDTO reqOrganizerDTO) {
+    public ResponseEntity<ResOrganizerDTO> createNewOrganizer(@Valid @RequestBody ReqOrganizerDTO reqOrganizerDTO) {
         // TODO: process POST request
         ResOrganizerDTO newOrganizer = this.organizerService.createNewOrganizer(reqOrganizerDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newOrganizer);
@@ -55,7 +57,7 @@ public class OrganizerController {
 
     @PutMapping("/organizer/{id}")
     @ApiMessage("update organizer by id")
-    public ResponseEntity<ResOrganizerDTO> putMethodName(@PathVariable("id") Long id,
+    public ResponseEntity<ResOrganizerDTO> putMethodName(@Valid @PathVariable("id") Long id,
             @RequestBody ReqOrganizerDTO reqOrganizerDTO) throws IdInvalidException {
         // TODO: process PUT request
         ResOrganizerDTO updatedOrganizerDTO = this.organizerService.updateOrganizerById(id, reqOrganizerDTO);
@@ -64,7 +66,7 @@ public class OrganizerController {
 
     @PutMapping("/organizer")
     @ApiMessage("update organizer by name")
-    public ResponseEntity<ResOrganizerDTO> updateOrganizer(@RequestBody ReqOrganizerDTO reqOrganizerDTO)
+    public ResponseEntity<ResOrganizerDTO> updateOrganizer(@Valid @RequestBody ReqOrganizerDTO reqOrganizerDTO)
             throws IdInvalidException {
         // TODO: process PUT request
         ResOrganizerDTO updatedOrganizerDTO = this.organizerService.updateOrganizer(reqOrganizerDTO);
@@ -73,7 +75,7 @@ public class OrganizerController {
 
     @DeleteMapping("/organizer/{id}")
     @ApiMessage("delete organizer")
-    public ResponseEntity<String> deleteOrganizer(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteOrganizer(@PathVariable("id") Long id) throws IdInvalidException {
         this.organizerService.deleteOrganizer(id);
         return ResponseEntity.ok().body("deleted");
     }

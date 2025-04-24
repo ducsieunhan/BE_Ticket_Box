@@ -51,7 +51,7 @@ public class ReqEventDTO {
 
     private String organizerName;
     private String organizerInfo;
-    @NotEmpty(message = "You must create at least 1 ticket type")
+    @Size(min = 1, message = "The tickets list must contain at least 1 ticket")
     private List<EventTicket> tickets;
 
     @Getter

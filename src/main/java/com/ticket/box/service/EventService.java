@@ -107,7 +107,7 @@ public class EventService {
         }
         Event optEvent = fromReqDtoToEvent(reqEvent);
         List<EventTicket> tickets = reqEvent.getTickets();
-        optEvent.setStatus(StatusEventEnum.WAITING_FOR_SALE);
+        optEvent.setStatus(StatusEventEnum.OPEN);
         Event currEvent = this.eventRepository.save(optEvent);
         for (EventTicket ticket : tickets) {
             Ticket newTicket = new Ticket();
