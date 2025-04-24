@@ -95,6 +95,10 @@ public class AuthController {
         .body(res);
   }
 
+  @GetMapping("/login")
+  public void oauth2Login() {
+  }
+
   @GetMapping("/account")
   @ApiMessage("Fetch account")
   public ResponseEntity<ResLoginDTO.UserLogin> getAccount() {

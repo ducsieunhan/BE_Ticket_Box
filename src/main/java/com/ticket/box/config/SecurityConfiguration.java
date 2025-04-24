@@ -3,9 +3,13 @@ package com.ticket.box.config;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.ticket.box.service.CustomOAuth2UserService;
+import com.ticket.box.service.OAuth2LoginSuccessHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,13 +33,18 @@ import com.ticket.box.util.SecurityUtil;
 public class SecurityConfiguration {
 
   private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  private CustomOAuth2UserService oAuth2UserService;
+
+  private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
   // signature
   @Value("${ticket.jwt.base64-secret}")
   private String jwtKey;
 
-  public SecurityConfiguration(CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+  public SecurityConfiguration(CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomOAuth2UserService customOAuth2UserService, @Lazy OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) {
     this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+    this.oAuth2UserService = customOAuth2UserService;
+    this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
   }
 
   @Bean
@@ -45,9 +54,20 @@ public class SecurityConfiguration {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authz -> authz
             .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/refresh",
-                "/api/v1/auth/register", "/api/v1/auth/**", "/storage/**")
+                "/api/v1/auth/register", "/api/v1/auth/**", "/storage/**", "/oauth/**" , "/login/oauth2/**", "/oauth2/**")
             .permitAll()
-            .anyRequest().authenticated())
+            .anyRequest().authenticated()
+        )
+            .oauth2Login(oauth2 -> oauth2
+                    .loginPage("/api/v1/auth/login")
+
+                    .userInfoEndpoint(userInfo -> userInfo
+                            .userService(oAuth2UserService)
+                    )
+                    .successHandler(oAuth2LoginSuccessHandler)
+//                    .defaultSuccessUrl("http://localhost:5173", true)
+
+            )
         // .anyRequest().permitAll())
         .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()) // programmed to using jwt
             .authenticationEntryPoint(customAuthenticationEntryPoint)) // token for authentication for all

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import com.ticket.box.util.constant.AuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -61,6 +62,10 @@ public class User implements UserDetails {
 
   @Column(name = "verification_expiration")
   private LocalDateTime verificationCodeExpiresAt;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "auth_provider")
+  private AuthenticationProvider authProvider;
 
   @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
