@@ -59,8 +59,4 @@ public class Event {
     @JoinColumn(name = "organizer_id")
     private Organizer organizer;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "events", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private List<User> users;
-
 }
