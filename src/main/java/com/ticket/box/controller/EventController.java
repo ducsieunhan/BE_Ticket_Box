@@ -1,6 +1,7 @@
 package com.ticket.box.controller;
 
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -39,7 +40,8 @@ public class EventController {
 
     @GetMapping("/event/{id}")
     @ApiMessage("Get event by id")
-    public ResponseEntity<ResEventDTO> getEventById(@PathVariable("id") Long id) throws IdInvalidException {
+    public ResponseEntity<ResEventDTO> getEventById(@PathVariable("id") Long id)
+            throws IdInvalidException, DataFormatException {
         ResEventDTO res = this.eventService.getEventById(id);
         return ResponseEntity.ok().body(res);
     }
@@ -53,14 +55,15 @@ public class EventController {
 
     @PutMapping("/event/{id}")
     public ResponseEntity<ResEventDTO> updateEvent(@PathVariable("id") Long id, @RequestBody ReqEventDTO reqEventDTO)
-            throws IdInvalidException {
+            throws IdInvalidException, DataFormatException {
         // TODO: process PUT request
         ResEventDTO res = this.eventService.handleUpdateEvent(reqEventDTO, id);
         return ResponseEntity.ok().body(res);
     }
 
     @PostMapping("/event")
-    public ResponseEntity<ResEventDTO> createNewEvent(@RequestBody ReqEventDTO reqEventDTO) throws IdInvalidException {
+    public ResponseEntity<ResEventDTO> createNewEvent(@RequestBody ReqEventDTO reqEventDTO)
+            throws IdInvalidException, DataFormatException {
         // TODO: process POST request
         ResEventDTO res = this.eventService.handleCreateEvent(reqEventDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);

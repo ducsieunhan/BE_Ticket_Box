@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
 
 import org.springframework.stereotype.Service;
 
@@ -46,12 +47,18 @@ public class EventService {
     public List<ResEventDTO> getAllEvents() {
         List<Event> events = this.eventRepository.findAll();
         List<ResEventDTO> results = events.stream()
-                .map(event -> toResEventDTO(event))
+                .map(event -> {
+                    try {
+                        return toResEventDTO(event);
+                    } catch (DataFormatException e) {
+                        throw new RuntimeException("Error converting event to ResEventDTO", e);
+                    }
+                })
                 .collect(Collectors.toList());
         return results;
     }
 
-    public ResEventDTO getEventById(Long id) throws IdInvalidException {
+    public ResEventDTO getEventById(Long id) throws IdInvalidException, DataFormatException {
         Optional<Event> event = this.eventRepository.findById(id);
         if (!event.isPresent()) {
             throw new IdInvalidException("Event is not exist");
@@ -60,7 +67,7 @@ public class EventService {
         return res;
     }
 
-    public ResEventDTO handleCreateEvent(ReqEventDTO reqEvent) throws IdInvalidException {
+    public ResEventDTO handleCreateEvent(ReqEventDTO reqEvent) throws IdInvalidException, DataFormatException {
         Optional<Category> currCategory = this.categoryRepository
                 .findByName(reqEvent.getCategory());
         Optional<Organizer> optOrganizer = this.organizerRepository.findByName(reqEvent.getOrganizerName());
@@ -93,7 +100,7 @@ public class EventService {
         return toResEventDTO(currEvent);
     }
 
-    public ResEventDTO handleUpdateEvent(ReqEventDTO reqEvent, Long id) throws IdInvalidException {
+    public ResEventDTO handleUpdateEvent(ReqEventDTO reqEvent, Long id) throws IdInvalidException, DataFormatException {
         Optional<Category> currCategory = this.categoryRepository
                 .findByName(reqEvent.getCategory());
         if (!currCategory.isPresent()) {
@@ -116,11 +123,20 @@ public class EventService {
         return this.userRepository.findUsersByEventId(eventId);
     }
 
-    public ResEventDTO toResEventDTO(Event event) {
+    public ResEventDTO toResEventDTO(Event event) throws DataFormatException {
         ResEventDTO res = new ResEventDTO();
         List<ResEventDTO.EventTicket> tickets = new ArrayList<>();
         List<ResEventDTO.Participant> participants = new ArrayList<>();
-
+        Optional<Organizer> optOrganizer = this.organizerRepository.findByName(event.getOrganizer().getName());
+        if (!optOrganizer.isPresent()) {
+            throw new DataFormatException("Organizer is not exist");
+        }
+        ResEventDTO.ResOrganizer organizer = new ResEventDTO.ResOrganizer();
+        organizer.setId(optOrganizer.get().getId());
+        organizer.setDescription(optOrganizer.get().getDescription());
+        organizer.setEmail(optOrganizer.get().getEmail());
+        organizer.setName(optOrganizer.get().getName());
+        organizer.setPhone(optOrganizer.get().getPhone());
         // Set basic event properties
         res.setId(event.getId());
         res.setName(event.getName());
@@ -131,11 +147,11 @@ public class EventService {
         res.setHouseNumber(event.getHouseNumber());
         res.setImgEventInfo(event.getImgEventInfo());
         res.setLogo(event.getLogo());
-        res.setOrganizerName(event.getOrganizer().getName());
         res.setProvince(event.getProvince());
         res.setStartDate(event.getStartDate());
         res.setWard(event.getWard());
         res.setStatus(event.getStatus());
+        res.setOrganizer(organizer);
         List<Ticket> tList = event.getTickets();
         if (tList != null && !tList.isEmpty()) {
             for (Ticket ticket : tList) {
