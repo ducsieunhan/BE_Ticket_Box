@@ -226,4 +226,31 @@ public class AuthController {
       return ResponseEntity.badRequest().body(e.getMessage());
     }
   }
+
+  @PostMapping("/reset_code")
+  public ResponseEntity<String> resetCodePassword(@RequestParam String email) {
+    try {
+      authService.sendCodeResetPassword(email);
+      return ResponseEntity.ok("Verification code sent");
+    } catch (IdInvalidException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  @PostMapping("/reset")
+  @ApiMessage("Reset password")
+  public ResponseEntity<String> resetPassword(@RequestBody ReqLoginDto loginDto)
+          throws IdInvalidException, DataInvalidException {
+    if (this.userService.handleGetUserByUsername(loginDto.getUsername()) == null) {
+      throw new IdInvalidException("Account not exist!!");
+    }
+    User newUser = this.authService.resetPassword(loginDto);
+
+    if (newUser == null) {
+      throw new IdInvalidException("Error !!");
+    }
+    return ResponseEntity.status(HttpStatus.CREATED).body("Successfully update new password");
+  }
+
+
 }

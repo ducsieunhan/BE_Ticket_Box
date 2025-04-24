@@ -71,6 +71,14 @@ public class AuthService {
       }
   }
 
+  public User resetPassword(ReqLoginDto loginDto ){
+    User currentUser = this.userService.handleGetUserByUsername(loginDto.getUsername());
+    String resetHashPassword = passwordEncoder.encode(loginDto.getPassword());
+    currentUser.setPassword(resetHashPassword);
+
+    return this.userRepository.save(currentUser);
+  }
+
   public void resendVerificationCode(String email) throws IdInvalidException {
 
     if (this.userService.handleGetUserByUsername(email) == null) {
@@ -85,6 +93,20 @@ public class AuthService {
       user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
       sendVerificationEmail(user);
       userRepository.save(user);
+
+  }
+
+  public void sendCodeResetPassword(String email) throws IdInvalidException {
+
+    if (this.userService.handleGetUserByUsername(email) == null) {
+      throw new IdInvalidException("This email not exist!!");
+    }
+
+    User user = userRepository.findByEmail(email);
+    user.setVerificationCode(generateVerificationCode());
+    user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
+    sendVerificationEmail(user);
+    userRepository.save(user);
 
   }
 
