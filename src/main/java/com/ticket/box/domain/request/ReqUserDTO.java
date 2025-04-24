@@ -56,6 +56,8 @@ public class ReqUserDTO {
 
         if (user.getRole() != null) {
             userDTO.setRole(user.getRole().getId());
+        } else {
+            userDTO.setRole((long) 1);
         }
 
         return userDTO;

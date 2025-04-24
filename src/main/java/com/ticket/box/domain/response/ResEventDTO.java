@@ -41,8 +41,9 @@ public class ResEventDTO {
 
     private List<EventTicket> tickets;
     private List<Participant> participants;
-    private String organizerName;
     private StatusEventEnum status;
+
+    private ResOrganizer organizer;
 
     @Getter
     @Setter
@@ -58,6 +59,22 @@ public class ResEventDTO {
 
         private String description;
         private Long sold;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ResOrganizer {
+        private Long id;
+        private String name;
+
+        private String email;
+
+        private String phone;
+
+        private String description;
+
     }
 
     @Getter
