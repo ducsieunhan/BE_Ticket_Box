@@ -70,7 +70,9 @@ public class UserService {
       currentUser.setDob(reqUser.getDob());
       currentUser.setEmail(reqUser.getEmail());
       currentUser.setName(reqUser.getName());
-      currentUser.setPassword(reqUser.getPassword());
+      if (reqUser.getPassword() != null) {
+        currentUser.setPassword(reqUser.getPassword());
+      }
       currentUser.setPhone(reqUser.getPhone());
       currentUser.setDistrict(reqUser.getDistrict());
       currentUser.setHouseNumber(reqUser.getHouseNumber());

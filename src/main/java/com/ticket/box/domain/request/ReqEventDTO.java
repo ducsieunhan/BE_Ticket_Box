@@ -1,6 +1,7 @@
 package com.ticket.box.domain.request;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,8 +33,8 @@ public class ReqEventDTO {
 
     private String name;
     private StatusEventEnum status;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String category;
 
     private String province;
