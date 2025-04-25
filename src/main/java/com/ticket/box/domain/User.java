@@ -50,6 +50,7 @@ public class User {
 
   private String houseNumber;
 
+  private String avatar;
   @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
   private Role role;

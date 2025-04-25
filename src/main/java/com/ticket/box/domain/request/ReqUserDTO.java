@@ -39,6 +39,7 @@ public class ReqUserDTO {
 
     private String houseNumber;
     private Long role;
+    private String avatar;
 
     public static ReqUserDTO fromEntity(User user) {
         ReqUserDTO userDTO = new ReqUserDTO();

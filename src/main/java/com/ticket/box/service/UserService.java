@@ -30,15 +30,15 @@ public class UserService {
     // if (reqUser.getRoleId() != 1 || reqUser.getRoleId() != 2) {
     // throw new IdInvalidException("Role is not exist");
     // }
-    if (reqUser.getPhone()!=null){
+    if (reqUser.getPhone() != null) {
       if (this.userRepository.existsByPhone(reqUser.getPhone())) {
-      throw new DataInvalidException("Phone is already exists");
-    }
+        throw new DataInvalidException("Phone is already exists");
+      }
     }
     if (this.userRepository.existsByEmail(reqUser.getEmail())) {
       throw new DataInvalidException("Email is already exists");
     }
-    
+
     User user = loadUserFromReqUserDTO(reqUser);
     // User user = modelMapper.map(reqUser, User.class);
     Role role = this.roleRepository.findById(reqUser.getRole()).get();
@@ -78,7 +78,7 @@ public class UserService {
       currentUser.setHouseNumber(reqUser.getHouseNumber());
       currentUser.setProvince(reqUser.getProvince());
       currentUser.setWard(reqUser.getWard());
-
+      currentUser.setAvatar(reqUser.getAvatar());
     }
     return this.userRepository.save(currentUser);
   }
@@ -101,7 +101,7 @@ public class UserService {
     res.setHouseNumber(user.getHouseNumber());
     res.setProvince(user.getProvince());
     res.setWard(user.getWard());
-
+    res.setAvatar(user.getAvatar());
     return res;
   }
 
@@ -117,6 +117,7 @@ public class UserService {
     user.setProvince(resUserDTO.getProvince());
     user.setRole(role);
     user.setWard(resUserDTO.getWard());
+    user.setAvatar(resUserDTO.getAvatar());
     return user;
   }
 
@@ -136,6 +137,7 @@ public class UserService {
     user.setProvince(reqUserDTO.getProvince());
     user.setRole(role.get());
     user.setWard(reqUserDTO.getWard());
+    user.setAvatar(reqUserDTO.getAvatar());
     return user;
   }
 
