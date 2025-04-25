@@ -132,6 +132,7 @@ public class EventService {
         }
         Event optEvent = fromReqDtoToEvent(reqEvent);
         optEvent.setId(id);
+        optEvent.setStatus(reqEvent.getStatus());
         Event currEvent = this.eventRepository.save(optEvent);
         return toResEventDTO(currEvent);
     }
@@ -148,9 +149,11 @@ public class EventService {
     public ResEventDTO toResEventDTO(Event event) throws DataFormatException {
         ResEventDTO res = new ResEventDTO();
         List<ResEventDTO.EventTicket> tickets = new ArrayList<>();
-        List<ResEventDTO.Participant> participants = new ArrayList<>();
+        // List<ResEventDTO.Participant> participants = new ArrayList<>();
         Optional<Organizer> optOrganizer = this.organizerRepository.findByName(event.getOrganizer().getName());
         if (!optOrganizer.isPresent()) {
+            Organizer organizer = new Organizer();
+            this.organizerRepository.save(optOrganizer.get());
             throw new DataFormatException("Organizer is not exist");
         }
         ResEventDTO.ResOrganizer organizer = new ResEventDTO.ResOrganizer();
