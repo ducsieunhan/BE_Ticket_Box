@@ -66,7 +66,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     ResLoginDTO res = new ResLoginDTO();
 
     if (user != null) {
-      res.setUser(new ResLoginDTO.UserLogin(user.getId(), user.getEmail(), user.getName()));
+      res.setUser(new ResLoginDTO.UserLogin(user.getId(), user.getEmail(), user.getName(), user.getRole().getName()));
     }
 
     String access_token = this.securityUtil.createAccessToken(user.getEmail(), res.getUser());
