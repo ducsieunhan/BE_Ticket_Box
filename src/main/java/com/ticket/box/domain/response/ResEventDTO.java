@@ -1,6 +1,7 @@
 package com.ticket.box.domain.response;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.ticket.box.domain.Organizer;
@@ -24,8 +25,8 @@ public class ResEventDTO {
     private Long id;
     private String name;
 
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String category;
 
     private String province;

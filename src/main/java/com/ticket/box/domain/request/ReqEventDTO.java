@@ -1,6 +1,7 @@
 package com.ticket.box.domain.request;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,8 +34,8 @@ public class ReqEventDTO {
 
     private String name;
     private StatusEventEnum status;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String category;
 
     private String province;
@@ -49,6 +51,7 @@ public class ReqEventDTO {
 
     private String organizerName;
     private String organizerInfo;
+    @Size(min = 1, message = "The tickets list must contain at least 1 ticket")
     private List<EventTicket> tickets;
 
     @Getter

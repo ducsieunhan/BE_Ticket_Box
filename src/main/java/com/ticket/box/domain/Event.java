@@ -1,13 +1,10 @@
 package com.ticket.box.domain;
 
 import java.sql.Date;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ticket.box.domain.response.ResEventDTO;
 import com.ticket.box.util.constant.StatusEventEnum;
 
 import jakarta.persistence.CascadeType;
@@ -21,7 +18,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.FetchType;
 import lombok.AllArgsConstructor;
@@ -40,8 +36,8 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String province;
 
     private String district;
@@ -62,9 +58,5 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id")
     private Organizer organizer;
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "events", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private List<User> users;
 
 }

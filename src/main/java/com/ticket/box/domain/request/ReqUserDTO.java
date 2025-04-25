@@ -22,8 +22,7 @@ public class ReqUserDTO {
     @NotBlank(message = "Name must not be blank")
     @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
-    @NotBlank(message = "Password must not be blank")
-    @Size(min = 6, message = "Password must be at least 8 characters long")
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
     @NotBlank(message = "Phone number must not be blank")
     @Pattern(regexp = "^[0-9]*$", message = "Phone number must contain only digits")

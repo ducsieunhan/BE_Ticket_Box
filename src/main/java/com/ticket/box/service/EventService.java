@@ -107,7 +107,7 @@ public class EventService {
         }
         Event optEvent = fromReqDtoToEvent(reqEvent);
         List<EventTicket> tickets = reqEvent.getTickets();
-        optEvent.setStatus(StatusEventEnum.WAITING_FOR_SALE);
+        optEvent.setStatus(StatusEventEnum.OPEN);
         Event currEvent = this.eventRepository.save(optEvent);
         for (EventTicket ticket : tickets) {
             Ticket newTicket = new Ticket();
@@ -141,9 +141,9 @@ public class EventService {
         this.eventRepository.deleteById(id);
     }
 
-    public List<User> findAllParticipants(Long eventId) {
-        return this.userRepository.findUsersByEventId(eventId);
-    }
+    // public List<User> findAllParticipants(Long eventId) {
+    // return this.userRepository.findUsersByEventId(eventId);
+    // }
 
     public ResEventDTO toResEventDTO(Event event) throws DataFormatException {
         ResEventDTO res = new ResEventDTO();
@@ -190,17 +190,17 @@ public class EventService {
         res.setTickets(tickets);
 
         // res.setParticipants(...);
-        List<User> users = findAllParticipants(event.getId());
-        if (users != null && !users.isEmpty()) {
-            for (User u : users) {
-                ResEventDTO.Participant participant = new ResEventDTO.Participant();
-                participant.setEmail(u.getEmail());
-                participant.setName(u.getName());
-                participant.setPhone(u.getPhone());
-                participants.add(participant);
-            }
-        }
-        res.setParticipants(participants);
+        // List<User> users = findAllParticipants(event.getId());
+        // if (users != null && !users.isEmpty()) {
+        // for (User u : users) {
+        // ResEventDTO.Participant participant = new ResEventDTO.Participant();
+        // participant.setEmail(u.getEmail());
+        // participant.setName(u.getName());
+        // participant.setPhone(u.getPhone());
+        // participants.add(participant);
+        // }
+        // }
+        // res.setParticipants(participants);
         return res;
     }
 

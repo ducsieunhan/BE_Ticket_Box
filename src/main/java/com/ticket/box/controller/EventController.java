@@ -25,6 +25,8 @@ import com.ticket.box.util.annotation.ApiMessage;
 import com.ticket.box.util.error.IdInvalidException;
 import com.turkraft.springfilter.boot.Filter;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,7 +63,8 @@ public class EventController {
     }
 
     @PutMapping("/event/{id}")
-    public ResponseEntity<ResEventDTO> updateEvent(@PathVariable("id") Long id, @RequestBody ReqEventDTO reqEventDTO)
+    public ResponseEntity<ResEventDTO> updateEvent(@Valid @PathVariable("id") Long id,
+            @RequestBody ReqEventDTO reqEventDTO)
             throws IdInvalidException, DataFormatException {
         // TODO: process PUT request
         ResEventDTO res = this.eventService.handleUpdateEvent(reqEventDTO, id);
@@ -69,7 +72,7 @@ public class EventController {
     }
 
     @PostMapping("/event")
-    public ResponseEntity<ResEventDTO> createNewEvent(@RequestBody ReqEventDTO reqEventDTO)
+    public ResponseEntity<ResEventDTO> createNewEvent(@Valid @RequestBody ReqEventDTO reqEventDTO)
             throws IdInvalidException, DataFormatException {
         // TODO: process POST request
         ResEventDTO res = this.eventService.handleCreateEvent(reqEventDTO);

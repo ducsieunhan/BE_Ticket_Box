@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   boolean existsByPhone(String phone);
 
-  @Query("SELECT u FROM User u JOIN u.events e WHERE e.id = :eventId")
-  List<User> findUsersByEventId(@Param("eventId") Long eventId);
+  // @Query("SELECT u FROM User u JOIN u.events e WHERE e.id = :eventId")
+  // List<User> findUsersByEventId(@Param("eventId") Long eventId);
 
 }
