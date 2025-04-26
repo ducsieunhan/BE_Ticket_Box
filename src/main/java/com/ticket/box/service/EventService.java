@@ -177,6 +177,7 @@ public class EventService {
         res.setWard(event.getWard());
         res.setStatus(event.getStatus());
         res.setOrganizer(organizer);
+        res.setDescImg(event.getDescImg());
         List<Ticket> tList = event.getTickets();
         if (tList != null && !tList.isEmpty()) {
             for (Ticket ticket : tList) {
@@ -237,6 +238,7 @@ public class EventService {
         event.setLogo(reqEventDTO.getLogo());
         event.setOrganizer(optOrganizer.get());
         event.setCategory(currCategory.get());
+        event.setDescImg(reqEventDTO.getDescImg());
         // lack setTickets
         for (ReqEventDTO.EventTicket ticket : reqEventDTO.getTickets()) {
             Ticket t = new Ticket();

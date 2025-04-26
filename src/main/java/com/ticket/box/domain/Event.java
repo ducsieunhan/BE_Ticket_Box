@@ -48,6 +48,7 @@ public class Event {
     private String imgEventInfo;
     private String banner;
     private String logo;
+    private String descImg;
     @Enumerated(EnumType.STRING)
     private StatusEventEnum status;
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)

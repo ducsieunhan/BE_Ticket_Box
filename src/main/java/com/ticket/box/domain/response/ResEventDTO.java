@@ -39,6 +39,7 @@ public class ResEventDTO {
     private String imgEventInfo;
     private String banner;
     private String logo;
+    private String descImg;
 
     private List<EventTicket> tickets;
     private List<Participant> participants;

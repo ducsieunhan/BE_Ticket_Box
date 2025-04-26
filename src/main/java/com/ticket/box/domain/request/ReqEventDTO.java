@@ -48,6 +48,7 @@ public class ReqEventDTO {
     private String imgEventInfo;
     private String banner;
     private String logo;
+    private String descImg;
 
     private String organizerName;
     private String organizerInfo;
