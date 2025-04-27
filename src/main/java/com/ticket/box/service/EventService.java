@@ -154,9 +154,7 @@ public class EventService {
             existingEvent.setCategory(currCategory.get());
         }
 
-        // Update organizer (optional, depends if you allow changing organizer)
-
-        // 💥 First, delete old tickets
+        // delete old tickets
         List<Ticket> oldTickets = existingEvent.getTickets();
         if (oldTickets != null && !oldTickets.isEmpty()) {
             for (Ticket t : oldTickets) {
@@ -164,7 +162,7 @@ public class EventService {
             }
         }
 
-        // 💥 Then, add new tickets
+        // add new tickets
         List<Ticket> newTickets = new ArrayList<>();
         for (ReqEventDTO.EventTicket ticketReq : reqEvent.getTickets()) {
             Ticket newTicket = new Ticket();
@@ -180,15 +178,13 @@ public class EventService {
 
         existingEvent.setTickets(newTickets);
 
-        // Finally save event
         Event updatedEvent = eventRepository.save(existingEvent);
 
         return toResEventDTO(updatedEvent);
     }
 
-
     public void handleDeleteEvent(Long id) {
-        // delete other table also
+
         this.eventRepository.deleteById(id);
     }
 
