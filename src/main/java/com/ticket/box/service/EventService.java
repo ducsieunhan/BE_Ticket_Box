@@ -129,7 +129,6 @@ public class EventService {
         }
         Event existingEvent = optionalEvent.get();
 
-        // Update event fields
         existingEvent.setName(reqEvent.getName());
         existingEvent.setStartDate(reqEvent.getStartDate());
         existingEvent.setEndDate(reqEvent.getEndDate());
@@ -208,7 +207,6 @@ public class EventService {
         organizer.setEmail(optOrganizer.get().getEmail());
         organizer.setName(optOrganizer.get().getName());
         organizer.setPhone(optOrganizer.get().getPhone());
-        // Set basic event properties
         res.setId(event.getId());
         res.setName(event.getName());
         res.setBanner(event.getBanner());
