@@ -123,19 +123,69 @@ public class EventService {
     }
 
     public ResEventDTO handleUpdateEvent(ReqEventDTO reqEvent, Long id) throws IdInvalidException, DataFormatException {
-        Optional<Category> currCategory = this.categoryRepository
-                .findByName(reqEvent.getCategory());
+        Optional<Event> optionalEvent = this.eventRepository.findById(id);
+        if (!optionalEvent.isPresent()) {
+            throw new IdInvalidException("Event not found");
+        }
+        Event existingEvent = optionalEvent.get();
+
+        // Update event fields
+        existingEvent.setName(reqEvent.getName());
+        existingEvent.setStartDate(reqEvent.getStartDate());
+        existingEvent.setEndDate(reqEvent.getEndDate());
+        existingEvent.setProvince(reqEvent.getProvince());
+        existingEvent.setDistrict(reqEvent.getDistrict());
+        existingEvent.setWard(reqEvent.getWard());
+        existingEvent.setHouseNumber(reqEvent.getHouseNumber());
+        existingEvent.setImgEventInfo(reqEvent.getImgEventInfo());
+        existingEvent.setBanner(reqEvent.getBanner());
+        existingEvent.setLogo(reqEvent.getLogo());
+        existingEvent.setStatus(reqEvent.getStatus());
+        existingEvent.setDescImg(reqEvent.getDescImg());
+
+        // Update category
+        Optional<Category> currCategory = this.categoryRepository.findByName(reqEvent.getCategory());
         if (!currCategory.isPresent()) {
             Category newCategory = new Category();
             newCategory.setName(reqEvent.getCategory());
             this.categoryRepository.save(newCategory);
+            existingEvent.setCategory(newCategory);
+        } else {
+            existingEvent.setCategory(currCategory.get());
         }
-        Event optEvent = fromReqDtoToEvent(reqEvent);
-        optEvent.setId(id);
-        optEvent.setStatus(reqEvent.getStatus());
-        Event currEvent = this.eventRepository.save(optEvent);
-        return toResEventDTO(currEvent);
+
+        // Update organizer (optional, depends if you allow changing organizer)
+
+        // 💥 First, delete old tickets
+        List<Ticket> oldTickets = existingEvent.getTickets();
+        if (oldTickets != null && !oldTickets.isEmpty()) {
+            for (Ticket t : oldTickets) {
+                ticketRepository.deleteById(t.getId());
+            }
+        }
+
+        // 💥 Then, add new tickets
+        List<Ticket> newTickets = new ArrayList<>();
+        for (ReqEventDTO.EventTicket ticketReq : reqEvent.getTickets()) {
+            Ticket newTicket = new Ticket();
+            newTicket.setType(ticketReq.getType());
+            newTicket.setDescription(ticketReq.getDescription());
+            newTicket.setPrice(ticketReq.getPrice());
+            newTicket.setQuantity(ticketReq.getQuantity());
+            newTicket.setSold(0); // when updating, reset sold if needed
+            newTicket.setEvent(existingEvent);
+            ticketRepository.save(newTicket);
+            newTickets.add(newTicket);
+        }
+
+        existingEvent.setTickets(newTickets);
+
+        // Finally save event
+        Event updatedEvent = eventRepository.save(existingEvent);
+
+        return toResEventDTO(updatedEvent);
     }
+
 
     public void handleDeleteEvent(Long id) {
         // delete other table also
