@@ -1,5 +1,8 @@
 package com.ticket.box.controller;
 
+import com.ticket.box.domain.require.VerifyUserDto;
+import com.ticket.box.service.AuthService;
+import com.ticket.box.util.error.VerificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ticket.box.domain.User;
 import com.ticket.box.domain.request.ReqUserDTO;
@@ -24,12 +27,6 @@ import com.ticket.box.util.annotation.ApiMessage;
 import com.ticket.box.util.error.DataInvalidException;
 import com.ticket.box.util.error.IdInvalidException;
 
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -39,20 +36,23 @@ public class AuthController {
   private final UserService userService;
   private PasswordEncoder passwordEncoder;
 
+  private AuthService authService;
+
   @Value("${ticket.jwt.refresh-token-validity-in-seconds}")
   private long refreshTokenExpiration;
 
   public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
-      UserService userService, PasswordEncoder passwordEncoder) {
+      UserService userService, PasswordEncoder passwordEncoder, AuthService authService) {
     this.authenticationManagerBuilder = authenticationManagerBuilder;
     this.securityUtil = securityUtil;
     this.userService = userService;
     this.passwordEncoder = passwordEncoder;
+    this.authService = authService;
   }
 
   @PostMapping("/login")
   @ApiMessage("Login Account")
-  public ResponseEntity<ResLoginDTO> login(@RequestBody ReqLoginDto loginDto) throws IdInvalidException {
+  public ResponseEntity<ResLoginDTO> login(@RequestBody ReqLoginDto loginDto) throws IdInvalidException, VerificationException {
     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
         loginDto.getUsername(), loginDto.getPassword());
     if (this.userService.handleGetUserByUsername(loginDto.getUsername()) == null) {
@@ -64,6 +64,10 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     User currentUser = this.userService.handleGetUserByUsername(loginDto.getUsername());
+
+    if(!currentUser.isEnabled()){
+      throw new VerificationException("Account not verified");
+    }
 
     ResLoginDTO res = new ResLoginDTO();
 
@@ -89,6 +93,10 @@ public class AuthController {
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, resCookie.toString())
         .body(res);
+  }
+
+  @GetMapping("/login")
+  public void oauth2Login() {
   }
 
   @GetMapping("/account")
@@ -191,17 +199,58 @@ public class AuthController {
     if (this.userService.handleGetUserByUsername(loginDto.getUsername()) != null) {
       throw new IdInvalidException("This email already exist!!");
     }
-    User newUser = new User();
-    newUser.setEmail(loginDto.getUsername());
-    String hashPassword = passwordEncoder.encode(loginDto.getPassword());
-    newUser.setPassword(hashPassword);
-    ReqUserDTO reqUser = ReqUserDTO.fromEntity(newUser);
-    User createUser = this.userService.createNewUser(reqUser);
+    User newUser = this.authService.signUp(loginDto);
 
-    if (createUser == null) {
+    if (newUser == null) {
       throw new IdInvalidException("Error !!");
     }
-
     return ResponseEntity.status(HttpStatus.CREATED).body("Successfully created new user");
   }
+
+  @PostMapping("/verify")
+  public ResponseEntity<String> verifyUser(@RequestBody VerifyUserDto verifyUserDto) {
+    try {
+      authService.verifyUser(verifyUserDto);
+      return ResponseEntity.ok("Account verified successfully");
+    } catch (IdInvalidException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  @PostMapping("/resend")
+  public ResponseEntity<String> resendVerificationCode(@RequestParam String email) {
+    try {
+      authService.resendVerificationCode(email);
+      return ResponseEntity.ok("Verification code sent");
+    } catch (IdInvalidException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  @PostMapping("/reset_code")
+  public ResponseEntity<String> resetCodePassword(@RequestParam String email) {
+    try {
+      authService.sendCodeResetPassword(email);
+      return ResponseEntity.ok("Verification code sent");
+    } catch (IdInvalidException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  @PostMapping("/reset")
+  @ApiMessage("Reset password")
+  public ResponseEntity<String> resetPassword(@RequestBody ReqLoginDto loginDto)
+          throws IdInvalidException, DataInvalidException {
+    if (this.userService.handleGetUserByUsername(loginDto.getUsername()) == null) {
+      throw new IdInvalidException("Account not exist!!");
+    }
+    User newUser = this.authService.resetPassword(loginDto);
+
+    if (newUser == null) {
+      throw new IdInvalidException("Error !!");
+    }
+    return ResponseEntity.status(HttpStatus.CREATED).body("Successfully update new password");
+  }
+
+
 }

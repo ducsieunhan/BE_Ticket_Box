@@ -1,9 +1,14 @@
 package com.ticket.box.domain;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
+import com.ticket.box.util.constant.AuthenticationProvider;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ticket.box.domain.response.ResEventDTO;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -15,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class User {
+public class User implements UserDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +55,18 @@ public class User {
 
   private String houseNumber;
 
+  private boolean enabled;
+
+  @Column(name = "verification_code")
+  private String verificationCode;
+
+  @Column(name = "verification_expiration")
+  private LocalDateTime verificationCodeExpiresAt;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "auth_provider")
+  private AuthenticationProvider authProvider;
+
   @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
   private Role role;
@@ -58,5 +75,35 @@ public class User {
   @JoinTable(name = "user_event", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
   @JsonIgnoreProperties({ "users", "tickets", "organizer" }) // Prevent JSON loops
   private List<Event> events;
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of();
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public String getUsername() {
+    throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
+  }
 
 }
