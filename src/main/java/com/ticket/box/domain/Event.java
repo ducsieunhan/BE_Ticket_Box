@@ -48,6 +48,7 @@ public class Event {
     private String imgEventInfo;
     private String banner;
     private String logo;
+    private String descImg;
     @Enumerated(EnumType.STRING)
     private StatusEventEnum status;
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)
@@ -58,9 +59,5 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id")
     private Organizer organizer;
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "events", cascade = CascadeType.REMOVE)
-    @JsonIgnore
-    private List<User> users;
 
 }

@@ -32,7 +32,7 @@ public class User implements UserDetails {
   @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
   private String name;
 
-  @Size(min = 6, message = "Password must be at least 8 characters long")
+  @Size(min = 6, message = "Password must be at least 6 characters long")
   private String password;
 
   @Column(columnDefinition = "MEDIUMTEXT")
@@ -55,6 +55,9 @@ public class User implements UserDetails {
 
   private String houseNumber;
 
+
+  private String avatar;
+
   private boolean enabled;
 
   @Column(name = "verification_code")
@@ -70,6 +73,7 @@ public class User implements UserDetails {
   @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
   private Role role;
+
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "user_event", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
@@ -105,5 +109,6 @@ public class User implements UserDetails {
   public String getUsername() {
     throw new UnsupportedOperationException("Unimplemented method 'getUsername'");
   }
+
 
 }

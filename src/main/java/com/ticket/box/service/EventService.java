@@ -107,7 +107,7 @@ public class EventService {
         }
         Event optEvent = fromReqDtoToEvent(reqEvent);
         List<EventTicket> tickets = reqEvent.getTickets();
-        optEvent.setStatus(StatusEventEnum.WAITING_FOR_SALE);
+        optEvent.setStatus(StatusEventEnum.OPEN);
         Event currEvent = this.eventRepository.save(optEvent);
         for (EventTicket ticket : tickets) {
             Ticket newTicket = new Ticket();
@@ -132,6 +132,7 @@ public class EventService {
         }
         Event optEvent = fromReqDtoToEvent(reqEvent);
         optEvent.setId(id);
+        optEvent.setStatus(reqEvent.getStatus());
         Event currEvent = this.eventRepository.save(optEvent);
         return toResEventDTO(currEvent);
     }
@@ -141,16 +142,18 @@ public class EventService {
         this.eventRepository.deleteById(id);
     }
 
-    public List<User> findAllParticipants(Long eventId) {
-        return this.userRepository.findUsersByEventId(eventId);
-    }
+    // public List<User> findAllParticipants(Long eventId) {
+    // return this.userRepository.findUsersByEventId(eventId);
+    // }
 
     public ResEventDTO toResEventDTO(Event event) throws DataFormatException {
         ResEventDTO res = new ResEventDTO();
         List<ResEventDTO.EventTicket> tickets = new ArrayList<>();
-        List<ResEventDTO.Participant> participants = new ArrayList<>();
+        // List<ResEventDTO.Participant> participants = new ArrayList<>();
         Optional<Organizer> optOrganizer = this.organizerRepository.findByName(event.getOrganizer().getName());
         if (!optOrganizer.isPresent()) {
+            Organizer organizer = new Organizer();
+            this.organizerRepository.save(optOrganizer.get());
             throw new DataFormatException("Organizer is not exist");
         }
         ResEventDTO.ResOrganizer organizer = new ResEventDTO.ResOrganizer();
@@ -174,6 +177,7 @@ public class EventService {
         res.setWard(event.getWard());
         res.setStatus(event.getStatus());
         res.setOrganizer(organizer);
+        res.setDescImg(event.getDescImg());
         List<Ticket> tList = event.getTickets();
         if (tList != null && !tList.isEmpty()) {
             for (Ticket ticket : tList) {
@@ -190,17 +194,17 @@ public class EventService {
         res.setTickets(tickets);
 
         // res.setParticipants(...);
-        List<User> users = findAllParticipants(event.getId());
-        if (users != null && !users.isEmpty()) {
-            for (User u : users) {
-                ResEventDTO.Participant participant = new ResEventDTO.Participant();
-                participant.setEmail(u.getEmail());
-                participant.setName(u.getName());
-                participant.setPhone(u.getPhone());
-                participants.add(participant);
-            }
-        }
-        res.setParticipants(participants);
+        // List<User> users = findAllParticipants(event.getId());
+        // if (users != null && !users.isEmpty()) {
+        // for (User u : users) {
+        // ResEventDTO.Participant participant = new ResEventDTO.Participant();
+        // participant.setEmail(u.getEmail());
+        // participant.setName(u.getName());
+        // participant.setPhone(u.getPhone());
+        // participants.add(participant);
+        // }
+        // }
+        // res.setParticipants(participants);
         return res;
     }
 
@@ -234,6 +238,7 @@ public class EventService {
         event.setLogo(reqEventDTO.getLogo());
         event.setOrganizer(optOrganizer.get());
         event.setCategory(currCategory.get());
+        event.setDescImg(reqEventDTO.getDescImg());
         // lack setTickets
         for (ReqEventDTO.EventTicket ticket : reqEventDTO.getTickets()) {
             Ticket t = new Ticket();

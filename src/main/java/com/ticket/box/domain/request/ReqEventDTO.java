@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,9 +48,11 @@ public class ReqEventDTO {
     private String imgEventInfo;
     private String banner;
     private String logo;
+    private String descImg;
 
     private String organizerName;
     private String organizerInfo;
+    @Size(min = 1, message = "The tickets list must contain at least 1 ticket")
     private List<EventTicket> tickets;
 
     @Getter
