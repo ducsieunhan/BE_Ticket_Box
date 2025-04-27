@@ -4,24 +4,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nimbusds.jose.shaded.gson.Gson;
-import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
-import com.ticket.box.config.VNPayConfig;
-import com.ticket.box.domain.Order;
 import com.ticket.box.domain.response.PaymentResDTO;
-import com.ticket.box.domain.response.ResOrderDTO;
+import com.ticket.box.domain.response.ResPaypalDTO;
 import com.ticket.box.service.OrderService;
 import com.ticket.box.service.PaymentService;
+import com.ticket.box.util.error.PaymentException;
 
-import io.micrometer.core.ipc.http.HttpSender.Response;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.UnsupportedEncodingException;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -97,18 +93,18 @@ public class PaymentController {
 
     @GetMapping("/paypal/success")
     public ResponseEntity<?> success(@RequestParam("paymentId") String paymentId,
-            @RequestParam("PayerID") String payerId) {
+            @RequestParam("PayerID") String payerId) throws PaymentException {
         try {
             Payment payment = paymentService.executePayment(paymentId, payerId);
             if (payment.getState().equals("approved")) {
-                return ResponseEntity.ok().body(payment);
+                ResPaypalDTO resPaypalDTO = paymentService.mapPaymentToResPaypalDTO(payment);
+                return ResponseEntity.ok().body(resPaypalDTO);
             }
-
         } catch (PayPalRESTException e) {
-            // TODO: handle exception
             e.printStackTrace();
+            throw new PaymentException("Payment is failed");
         }
-        return ResponseEntity.badRequest().body("Failed to execute payment");
+        return ResponseEntity.badRequest().body("Payment not approved");
     }
 
     @GetMapping("/paypal/cancel")

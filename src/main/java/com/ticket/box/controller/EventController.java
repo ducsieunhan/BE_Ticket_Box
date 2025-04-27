@@ -47,7 +47,7 @@ public class EventController {
         return ResponseEntity.ok().body(this.eventService.getAllEvents(spec, pageable));
     }
 
-    @GetMapping("/event/{id}")
+    @GetMapping("/events/{id}")
     @ApiMessage("Get event by id")
     public ResponseEntity<ResEventDTO> getEventById(@PathVariable("id") Long id)
             throws IdInvalidException, DataFormatException {

@@ -5,7 +5,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 import com.ticket.box.config.VNPayConfig;
 import com.ticket.box.domain.response.PaymentResDTO;
+import com.ticket.box.domain.response.ResPaypalDTO;
 import com.ticket.box.util.VNPayUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,11 +51,11 @@ public class PaymentService {
             String fieldName = (String) itr.next();
             String fieldValue = (String) vnpParamsMap.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                // Build hash data
+                // build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
                 hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                // Build query
+                // build query
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
                 query.append('=');
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
@@ -115,4 +115,27 @@ public class PaymentService {
         paymentExecution.setPayerId(payerId);
         return payment.execute(apiContext, paymentExecution);
     }
+
+    public ResPaypalDTO mapPaymentToResPaypalDTO(Payment payment) {
+        ResPaypalDTO resPaypalDTO = new ResPaypalDTO();
+        resPaypalDTO.setId(payment.getId());
+        resPaypalDTO.setState(payment.getState());
+        resPaypalDTO.setCreateTime(payment.getCreateTime());
+        resPaypalDTO.setUpdateTime(payment.getUpdateTime());
+        resPaypalDTO.setIntent(payment.getIntent());
+
+        if (payment.getPayer() != null && payment.getPayer().getPayerInfo() != null) {
+            resPaypalDTO.setPayerEmail(payment.getPayer().getPayerInfo().getEmail());
+            resPaypalDTO.setPayerFirstName(payment.getPayer().getPayerInfo().getFirstName());
+            resPaypalDTO.setPayerLastName(payment.getPayer().getPayerInfo().getLastName());
+        }
+
+        if (!payment.getTransactions().isEmpty()) {
+            resPaypalDTO.setCurrency(payment.getTransactions().get(0).getAmount().getCurrency());
+            resPaypalDTO.setTotalAmount(payment.getTransactions().get(0).getAmount().getTotal());
+        }
+
+        return resPaypalDTO;
+    }
+
 }
