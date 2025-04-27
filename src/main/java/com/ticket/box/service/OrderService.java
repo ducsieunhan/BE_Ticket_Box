@@ -133,6 +133,16 @@ public class OrderService {
     this.orderRepository.save(order);
   }
 
+  public void handleAfterPayment(Long orderId) {
+    Optional<Order> optOrder = this.orderRepository.findById(orderId);
+    if (!optOrder.isPresent()) {
+      throw new OrderNotFoundException(orderId);
+    }
+    Order order = optOrder.get();
+    order.setStatus(StatusOrderEnum.CONFIRMED);
+    this.orderRepository.save(order);
+  }
+
   public ResultPaginationDTO handleGetAllOrders(Specification<Order> spec, Pageable pageable) {
     Page<Order> pOrder = this.orderRepository.findAll(spec, pageable);
     ResultPaginationDTO rs = new ResultPaginationDTO();

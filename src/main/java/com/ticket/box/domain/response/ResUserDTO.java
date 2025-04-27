@@ -25,6 +25,7 @@ public class ResUserDTO {
     private String ward;
     private String houseNumber;
     private String role;
+    private String avatar;
 
     @Getter
     @Setter
