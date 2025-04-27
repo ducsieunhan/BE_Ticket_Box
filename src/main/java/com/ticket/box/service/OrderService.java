@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.ticket.box.domain.Event;
+import com.ticket.box.domain.response.*;
+import com.ticket.box.repository.UserRepository;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,9 +22,6 @@ import com.ticket.box.domain.require.ReqOrderDetailDto;
 import com.ticket.box.domain.require.ReqOrderDto;
 import com.ticket.box.domain.require.ReqUpdateOrderDetail;
 import com.ticket.box.domain.require.ReqUpdateOrderDto;
-import com.ticket.box.domain.response.ResOrderDTO;
-import com.ticket.box.domain.response.ResOrderDetailDTO;
-import com.ticket.box.domain.response.ResultPaginationDTO;
 import com.ticket.box.repository.OrderDetailRepository;
 import com.ticket.box.repository.OrderRepository;
 import com.ticket.box.util.SecurityUtil;
@@ -35,12 +36,15 @@ public class OrderService {
   private OrderDetailService orderDetailService;
   private OrderDetailRepository orderDetailRepository;
 
+  private UserRepository userRepository;
+
   public OrderService(OrderRepository orderRepository, UserService userService, OrderDetailService orderDetailService,
-      OrderDetailRepository orderDetailRepository) {
+      OrderDetailRepository orderDetailRepository, UserRepository userRepository) {
     this.orderRepository = orderRepository;
     this.userService = userService;
     this.orderDetailService = orderDetailService;
     this.orderDetailRepository = orderDetailRepository;
+    this.userRepository = userRepository;
   }
 
   public Order handleCreateNewOrder(ReqOrderDto orderdDto) throws IdInvalidException {
@@ -100,6 +104,21 @@ public class OrderService {
     return this.orderRepository.findById(id)
         .orElseThrow(() -> new OrderNotFoundException(id));
   }
+
+  public List<ResUserOrder> handleGetOrdersOfUser(long id) throws IdInvalidException{
+      User user = this.userRepository.findById(id)
+              .orElseThrow(() -> new IdInvalidException("Not found user"));
+
+      List<Order> orders = this.orderRepository.getByUserId(id);
+
+      List<ResUserOrder> resOrders = new ArrayList<>();
+      for (Order order : orders){
+        ResUserOrder newOrder = handleCastToUserOrder(order);
+        resOrders.add(newOrder);
+      }
+      return resOrders;
+  }
+
 
   public void handleDeleteOrder(Order order) {
     List<OrderDetail> items = this.orderDetailRepository.findByOrderId(order.getId());
@@ -172,6 +191,45 @@ public class OrderService {
       dto.add(converted);
     }
 
+    orderDTO.setItems(dto);
+
+    return orderDTO;
+  }
+
+  public ResUserOrder handleCastToUserOrder(Order order) {
+    ResUserOrder orderDTO = new ResUserOrder();
+
+    orderDTO.setOrderId(order.getId());
+    orderDTO.setReceiverEmail(order.getReceiverEmail());
+    orderDTO.setTotalPrice(order.getTotalPrice());
+
+    orderDTO.setStatus(order.getStatus());
+    orderDTO.setCreatedAt(order.getCreatedAt());
+
+
+    // event
+
+    if (!order.getOrderDetails().isEmpty()) {
+      Event event = order.getOrderDetails().get(0).getTicket().getEvent();
+      ResUserOrder.EventDTO eventDTO = new ResUserOrder.EventDTO();
+      eventDTO.setId(event.getId());
+      eventDTO.setName(event.getName());
+      eventDTO.setStartDate(event.getStartDate());
+      eventDTO.setBanner(event.getBanner());
+      eventDTO.setStatus(event.getStatus());
+      eventDTO.setEndDate(event.getEndDate());
+      orderDTO.setEvent(eventDTO);
+    }
+
+
+    // order detail
+    List<ResUserOrderDetail> dto = new ArrayList<>();
+
+
+    for (OrderDetail o : order.getOrderDetails()) {
+      ResUserOrderDetail converted = this.orderDetailService.convertToResUserOrderDetail(o);
+      dto.add(converted);
+    }
     orderDTO.setItems(dto);
 
     return orderDTO;

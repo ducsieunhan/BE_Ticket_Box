@@ -2,6 +2,7 @@ package com.ticket.box.controller;
 
 import java.util.List;
 
+import com.ticket.box.domain.response.ResUserOrder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -70,6 +71,17 @@ public class OrderController {
     Order currentOrder = this.orderService.handleGetAOrder(id);
     return ResponseEntity.ok().body(this.orderService.handleCastToResOrderDTO(currentOrder));
   }
+
+  @GetMapping("/user_orders/{id}")
+  @ApiMessage("Get user's orders")
+  public ResponseEntity<List<ResUserOrder>> getUserOrders(@PathVariable("id") long id) throws IdInvalidException{
+    try{
+      return ResponseEntity.ok().body(this.orderService.handleGetOrdersOfUser(id));
+    } catch (IdInvalidException e){
+      throw new IdInvalidException("User not found");
+    }
+  }
+
 
   @GetMapping("/orders")
   @ApiMessage("Get all orders")

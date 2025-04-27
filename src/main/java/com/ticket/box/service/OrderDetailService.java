@@ -3,6 +3,7 @@ package com.ticket.box.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ticket.box.domain.response.ResUserOrderDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -67,10 +68,11 @@ public class OrderDetailService {
     orderDetail.setTicket(currentTicket);
 
     orderDetail.setPrice(dto.getSubTotal());
-    orderDetail.setQuantity(dto.getQuantity());
 
     try {
       currentTicket.setQuantity(currentTicket.getQuantity() - dto.getQuantity());
+      currentTicket.setSold(currentTicket.getSold() + dto.getQuantity());
+      orderDetail.setQuantity(dto.getQuantity());
       this.ticketRepository.save(currentTicket);
     } catch (Exception e) {
       throw new TicketQuantityNotAvail("Not available quantity of ticket");
@@ -139,6 +141,24 @@ public class OrderDetailService {
     ticket.setTicketId(orderDetail.getTicket().getId());
     ticket.setName(orderDetail.getTicket().getDescription());
     ticket.setEvent(orderDetail.getTicket().getEvent().getName());
+    dto.setTicket(ticket);
+
+    return dto;
+
+  }
+
+  public ResUserOrderDetail convertToResUserOrderDetail(OrderDetail orderDetail) {
+    ResUserOrderDetail dto = new ResUserOrderDetail();
+    ResUserOrderDetail.TicketOrder ticket = new ResUserOrderDetail.TicketOrder();
+
+    dto.setOrderDetailId(orderDetail.getId());
+    dto.setPrice(orderDetail.getTicket().getPrice());
+    dto.setQuantity(orderDetail.getQuantity());
+    dto.setSubTotal(dto.getPrice() * dto.getQuantity());
+
+    ticket.setTicketId(orderDetail.getTicket().getId());
+    ticket.setName(orderDetail.getTicket().getDescription());
+
     dto.setTicket(ticket);
 
     return dto;

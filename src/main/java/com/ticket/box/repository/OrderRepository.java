@@ -11,4 +11,6 @@ import com.ticket.box.domain.Order;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long>,
     JpaSpecificationExecutor<Order> {
+
+  List<Order> getByUserId(long id);
 }

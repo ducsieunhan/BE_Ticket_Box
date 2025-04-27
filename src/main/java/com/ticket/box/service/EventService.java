@@ -177,6 +177,7 @@ public class EventService {
         res.setWard(event.getWard());
         res.setStatus(event.getStatus());
         res.setOrganizer(organizer);
+
         res.setDescImg(event.getDescImg());
         List<Ticket> tList = event.getTickets();
         if (tList != null && !tList.isEmpty()) {
