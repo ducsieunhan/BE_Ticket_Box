@@ -29,6 +29,7 @@ public class ResUserOrder {
   @Getter
   @Setter
   public static class EventDTO {
+    private long id ;
     private String name;
     private String banner ;
     private LocalDateTime startDate;

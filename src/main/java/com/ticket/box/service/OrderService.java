@@ -202,6 +202,7 @@ public class OrderService {
     if (!order.getOrderDetails().isEmpty()) {
       Event event = order.getOrderDetails().get(0).getTicket().getEvent();
       ResUserOrder.EventDTO eventDTO = new ResUserOrder.EventDTO();
+      eventDTO.setId(event.getId());
       eventDTO.setName(event.getName());
       eventDTO.setStartDate(event.getStartDate());
       eventDTO.setBanner(event.getBanner());
