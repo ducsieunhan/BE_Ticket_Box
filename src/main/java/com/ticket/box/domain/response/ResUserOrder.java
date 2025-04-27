@@ -35,6 +35,10 @@ public class ResUserOrder {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private StatusEventEnum status ;
+    private String district;
+    private String province;
+    private String ward;
+    private String houseNumber; 
   }
 
 }
