@@ -210,14 +210,8 @@ public class OrderService {
     // event
 
     if (!order.getOrderDetails().isEmpty()) {
-      Event event = order.getOrderDetails().get(0).getTicket().getEvent();
-      ResUserOrder.EventDTO eventDTO = new ResUserOrder.EventDTO();
-      eventDTO.setId(event.getId());
-      eventDTO.setName(event.getName());
-      eventDTO.setStartDate(event.getStartDate());
-      eventDTO.setBanner(event.getBanner());
-      eventDTO.setStatus(event.getStatus());
-      eventDTO.setEndDate(event.getEndDate());
+      ResUserOrder.EventDTO eventDTO = getEventDTO(order);
+
       orderDTO.setEvent(eventDTO);
     }
 
@@ -233,6 +227,22 @@ public class OrderService {
     orderDTO.setItems(dto);
 
     return orderDTO;
+  }
+
+  private static ResUserOrder.EventDTO getEventDTO(Order order) {
+    Event event = order.getOrderDetails().get(0).getTicket().getEvent();
+    ResUserOrder.EventDTO eventDTO = new ResUserOrder.EventDTO();
+    eventDTO.setId(event.getId());
+    eventDTO.setName(event.getName());
+    eventDTO.setStartDate(event.getStartDate());
+    eventDTO.setBanner(event.getBanner());
+    eventDTO.setStatus(event.getStatus());
+    eventDTO.setEndDate(event.getEndDate());
+    eventDTO.setDistrict(event.getDistrict());
+    eventDTO.setWard(event.getWard());
+    eventDTO.setProvince(event.getProvince());
+    eventDTO.setHouseNumber(event.getHouseNumber());
+    return eventDTO;
   }
 
   public List<ResOrderDTO> handleConvertToListResOrderDto(List<Order> orders) {
