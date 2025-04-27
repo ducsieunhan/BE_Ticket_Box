@@ -1,6 +1,7 @@
 package com.ticket.box.controller;
 
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -49,7 +50,7 @@ public class OrganizerController {
 
     @PostMapping("/organizer")
     @ApiMessage("create new organizer")
-    public ResponseEntity<ResOrganizerDTO> createNewOrganizer(@Valid @RequestBody ReqOrganizerDTO reqOrganizerDTO) {
+    public ResponseEntity<ResOrganizerDTO> createNewOrganizer(@Valid @RequestBody ReqOrganizerDTO reqOrganizerDTO) throws DataFormatException {
         // TODO: process POST request
         ResOrganizerDTO newOrganizer = this.organizerService.createNewOrganizer(reqOrganizerDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newOrganizer);
@@ -58,7 +59,7 @@ public class OrganizerController {
     @PutMapping("/organizer/{id}")
     @ApiMessage("update organizer by id")
     public ResponseEntity<ResOrganizerDTO> putMethodName(@Valid @PathVariable("id") Long id,
-            @RequestBody ReqOrganizerDTO reqOrganizerDTO) throws IdInvalidException {
+            @RequestBody ReqOrganizerDTO reqOrganizerDTO) throws IdInvalidException, DataFormatException {
         // TODO: process PUT request
         ResOrganizerDTO updatedOrganizerDTO = this.organizerService.updateOrganizerById(id, reqOrganizerDTO);
         return ResponseEntity.ok().body(updatedOrganizerDTO);
@@ -67,7 +68,7 @@ public class OrganizerController {
     @PutMapping("/organizer")
     @ApiMessage("update organizer by name")
     public ResponseEntity<ResOrganizerDTO> updateOrganizer(@Valid @RequestBody ReqOrganizerDTO reqOrganizerDTO)
-            throws IdInvalidException {
+            throws IdInvalidException, DataFormatException {
         // TODO: process PUT request
         ResOrganizerDTO updatedOrganizerDTO = this.organizerService.updateOrganizer(reqOrganizerDTO);
         return ResponseEntity.ok().body(updatedOrganizerDTO);

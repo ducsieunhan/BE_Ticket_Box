@@ -3,7 +3,9 @@ package com.ticket.box.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.DataFormatException;
 
+import com.ticket.box.util.error.DataInvalidException;
 import org.springframework.stereotype.Service;
 
 import com.ticket.box.domain.Event;
@@ -42,7 +44,14 @@ public class OrganizerService {
         return organizer;
     }
 
-    public ResOrganizerDTO createNewOrganizer(ReqOrganizerDTO reqOrganizerDTO) {
+    public ResOrganizerDTO createNewOrganizer(ReqOrganizerDTO reqOrganizerDTO) throws DataFormatException {
+        Optional<Organizer> optionalOrganizer=this.organizerRepository.findByName(reqOrganizerDTO.getName());
+        Optional<Organizer> optional2=this.organizerRepository.findByEmail(reqOrganizerDTO.getEmail());
+        if (optionalOrganizer.isPresent()){
+            throw new DataFormatException("Organizer name is already exist.") ;
+        }if (optional2.isPresent()){
+            throw new DataFormatException("Organizer email is already exist.") ;
+        }
         Organizer organizer = this.organizerRepository.save(castFromReqToEntity(reqOrganizerDTO));
         return castToResOrganizer(organizer);
     }
@@ -64,10 +73,11 @@ public class OrganizerService {
         return castToResOrganizer(organizer.get());
     }
 
-    public ResOrganizerDTO updateOrganizer(ReqOrganizerDTO reqOrganizerDTO) throws IdInvalidException {
+    public ResOrganizerDTO updateOrganizer(ReqOrganizerDTO reqOrganizerDTO) throws DataFormatException {
         Optional<Organizer> organizer = this.organizerRepository.findByName(reqOrganizerDTO.getName());
-        if (!organizer.isPresent()) {
-            throw new IdInvalidException("Organizer is not exist.");
+
+        if (organizer.isPresent()) {
+            throw new DataFormatException("Organizer name is already exist.");
         }
         Organizer result = organizer.get();
         result.setEmail(reqOrganizerDTO.getEmail());
@@ -77,10 +87,17 @@ public class OrganizerService {
         return castToResOrganizer(result);
     }
 
-    public ResOrganizerDTO updateOrganizerById(Long id, ReqOrganizerDTO reqOrganizerDTO) throws IdInvalidException {
+    public ResOrganizerDTO updateOrganizerById(Long id, ReqOrganizerDTO reqOrganizerDTO) throws IdInvalidException, DataFormatException {
         Optional<Organizer> organizer = this.organizerRepository.findById(id);
+        Optional<Organizer> organizer1=this.organizerRepository.findByEmail(reqOrganizerDTO.getEmail());
+        Optional<Organizer> organizer2=this.organizerRepository.findByName(reqOrganizerDTO.getName());
         if (!organizer.isPresent()) {
             throw new IdInvalidException("Organizer is not exist.");
+        }
+        if (organizer1.isPresent()){
+            throw new DataFormatException("Organizer email is already exist.");
+        } if (organizer2.isPresent()){
+            throw new DataFormatException("Organizer name is already exist.");
         }
         Organizer result = organizer.get();
         result.setName(reqOrganizerDTO.getName());
