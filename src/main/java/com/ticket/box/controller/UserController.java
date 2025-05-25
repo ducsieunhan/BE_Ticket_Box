@@ -53,7 +53,7 @@ public class UserController {
   public ResponseEntity<List<ResUserDTO>> getUsers() {
     List<User> users = this.userService.getAllUsers();
     List<ResUserDTO> resUserDTOs = users.stream().map(userService::convertResUserDTO).collect(Collectors.toList());
-    return ResponseEntity.status(HttpStatus.CREATED).body(resUserDTOs);
+    return ResponseEntity.status(HttpStatus.OK).body(resUserDTOs);
   }
 
   @GetMapping("/users/{id}")
