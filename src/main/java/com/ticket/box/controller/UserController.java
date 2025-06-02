@@ -45,7 +45,8 @@ public class UserController {
     String hashPassword = passwordEncoder.encode(user.getPassword());
     user.setPassword(hashPassword);
     User endUser = this.userService.createNewUser(user);
-    return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertResUserDTO(endUser));
+    ResUserDTO res = this.userService.convertResUserDTO(endUser);
+    return ResponseEntity.status(HttpStatus.CREATED).body(res);
   }
 
   @GetMapping("/users")

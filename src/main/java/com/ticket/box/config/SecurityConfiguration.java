@@ -59,7 +59,8 @@ public class SecurityConfiguration {
                 "api/v1/events/**", "/oauth/**" , "/login/oauth2/**", "/oauth2/**")
 
             .permitAll()
-            .anyRequest().authenticated()
+//                .anyRequest().authenticated()
+                .anyRequest().permitAll()
         )
             .oauth2Login(oauth2 -> oauth2
                     .loginPage("/api/v1/auth/login")

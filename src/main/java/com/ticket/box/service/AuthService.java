@@ -93,7 +93,6 @@ public class AuthService {
       user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
       sendVerificationEmail(user);
       userRepository.save(user);
-
   }
 
   public void sendCodeResetPassword(String email) throws IdInvalidException {
