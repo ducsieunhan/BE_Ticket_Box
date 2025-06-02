@@ -3,6 +3,7 @@ package com.ticket.box.controller;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
+import com.ticket.box.util.annotation.TrackExecutionTime;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,7 @@ public class EventController {
         this.eventService = eventService;
     }
 
+    @TrackExecutionTime
     @GetMapping("/events")
     @ApiMessage("Get all events")
     public ResponseEntity<ResultPaginationDTO> getAllEvents(

@@ -2,6 +2,7 @@ package com.ticket.box.controller;
 
 import com.ticket.box.domain.require.VerifyUserDto;
 import com.ticket.box.service.AuthService;
+import com.ticket.box.util.annotation.TrackExecutionTime;
 import com.ticket.box.util.error.VerificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -49,6 +50,7 @@ public class AuthController {
     this.authService = authService;
   }
 
+  @TrackExecutionTime
   @PostMapping("/login")
   @ApiMessage("Login Account")
   public ResponseEntity<ResLoginDTO> login(@RequestBody ReqLoginDto loginDto) throws IdInvalidException, VerificationException {
@@ -193,6 +195,7 @@ public class AuthController {
 
   @PostMapping("/register")
   @ApiMessage("Logout account")
+  @TrackExecutionTime
   public ResponseEntity<String> getRegister(@RequestBody ReqLoginDto loginDto)
       throws IdInvalidException, DataInvalidException {
     if (this.userService.handleGetUserByUsername(loginDto.getUsername()) != null) {
